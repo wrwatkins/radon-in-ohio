@@ -1,28 +1,27 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags %}
-
-{% block meta %}
-<meta name="description" content="Search for radon levels by Ohio ZIP Code or county. Radon is the leading cause of lung cancer after smoking.">
-<meta property="og:title" content="Radon in Ohio">
-<meta property="og:description" content="Search for radon levels by Ohio ZIP Code or county.">
-<meta property="og:type" content="website">
-{% endblock %}
+{% load static wagtailcore_tags %}
 
 {% block title %}Radon in Ohio — Search Radon Levels by ZIP Code or County{% endblock %}
+{% block og_title %}Radon in Ohio — Search Radon Levels by ZIP Code or County{% endblock %}
+{% block og_description %}Search for radon levels by Ohio ZIP code or county. Radon is the leading cause of lung cancer after smoking. Find licensed Ohio radon contractors and testers.{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Search for radon levels by Ohio ZIP code or county. Radon is the leading cause of lung cancer after smoking. Find licensed Ohio radon testers and mitigation contractors.">
+{% endblock %}
 
 {% block content %}
 <div class="jumbotron-fluid w3-flat-asbestos text-center" id="main-jumbotron"
-     style="background-image: url('/static/images/backgrounds/columbus-1936112.jpg');
-            background-size: cover; background-position: center; min-height: 60vh;">
+     style="background-image: url('{% static 'images/backgrounds/' %}{{ bg_photo }}');">
   <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
     <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
     <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
     <form class="form-inline mt-5 input-group-lg form-group mx-auto row justify-content-center" id="main-query-zip-form">
       <input class="form-control input-lg" type="search" id="main-query-zip"
-             placeholder="OH ZIP Code" aria-label="Search">
+             placeholder="OH ZIP Code" aria-label="Search by ZIP code">
       <button class="btn btn-primary ml-2 btn-lg" id="main-query-zip-submit" type="submit">Search</button>
     </form>
     <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none"></small>
+    <p class="text-white mt-4 small">{{ bg_caption }}</p>
   </div>
 </div>
 
@@ -32,7 +31,7 @@
 
       <div class="article">
         <h1>Map of highest radon levels in Ohio</h1>
-        <div id="map" style="height: 400px;" class="mb-2"></div>
+        <div id="map" style="height: 450px;" class="mb-2 rounded"></div>
         <p class="figure-caption">Data provided by Ohio Department of Health on 2020-03-01.</p>
         {% if page.intro %}
           <div>{{ page.intro|richtext }}</div>
@@ -43,15 +42,17 @@
         {% endif %}
       </div>
 
+      {% include "partials/amazon_ad.html" %}
+
       <div class="article mt-4">
         <h2>Radon levels for popular Ohio ZIP Codes</h2>
-        <p>Select any Ohio ZIP Code to learn about radon levels in that ZIP Code, city, and county.</p>
+        <p>Select any Ohio ZIP code to learn about radon levels in that area, city, and county.</p>
         <table class="table table-responsive-lg table-bordered text-center">
           <thead class="thead-dark">
             <tr>
-              <th scope="col" class="text-left">Ohio Zip Code</th>
+              <th scope="col" class="text-left">Ohio ZIP Code</th>
               <th scope="col">Ohio City</th>
-              <th scope="col">Number of Radon Tests</th>
+              <th scope="col">Radon Tests</th>
               <th scope="col">Average Radon Level</th>
             </tr>
           </thead>
@@ -60,7 +61,7 @@
             <tr>
               <td class="text-left"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
               <td><a href="{{ zip.get_absolute_url }}">{{ zip.city }}</a></td>
-              <td>{{ zip.radon_level.testcount|default:"—" }}</td>
+              <td>{% if zip.radon_level %}{{ zip.radon_level.testcount }}{% else %}—{% endif %}</td>
               <td>
                 {% if zip.radon_level %}
                   <span class="text-danger"><i class="fas fa-exclamation-triangle"></i>
@@ -82,9 +83,9 @@
         <table class="table table-responsive-lg table-bordered text-center">
           <thead class="thead-dark">
             <tr>
-              <th scope="col" class="text-left">Ohio Zip Code</th>
+              <th scope="col" class="text-left">Ohio ZIP Code</th>
               <th scope="col">Ohio City</th>
-              <th scope="col">Number of Radon Tests</th>
+              <th scope="col">Radon Tests</th>
               <th scope="col">Average Radon Level</th>
             </tr>
           </thead>
@@ -103,8 +104,6 @@
         <p class="figure-caption">From Ohio Department of Health on 2020-03-01.</p>
       </div>
 
-      {% include "partials/amazon_ad.html" %}
-
     </div>
     <div id="side-bar" class="col-3 d-none d-lg-block">
       {% include "partials/sidebar_resources.html" %}
@@ -115,6 +114,8 @@
 
 {% block extra_js %}
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Hero search form
   document.getElementById("main-query-zip-form").addEventListener("submit", function(e) {
     e.preventDefault();
     var zip = document.getElementById("main-query-zip").value.trim();
@@ -127,19 +128,103 @@
     }
   });
 
-  // Leaflet map — Ohio state + top county/ZIP choropleth
+  // ── Choropleth map ────────────────────────────────────────────────────────
   var map = L.map("map", { zoomSnap: 0.1 });
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
   }).addTo(map);
-  map.setView([40.4, -82.9], 7);
+
+  var top15counties = {{ geojson_counties|safe }};
+  var top15zips = {{ geojson_zips|safe }};
 
   function getColor(radon) {
+    radon = parseFloat(radon);
     return radon > 10 ? "#e81e25" :
-           radon > 8  ? "#f9a01b" :
-           radon > 6  ? "#fff200" :
-           radon > 4  ? "#b2d235" :
-           radon > 2  ? "#5bc9e1" : "#00aaad";
+           radon >  8 ? "#f9a01b" :
+           radon >  6 ? "#fff200" :
+           radon >  4 ? "#b2d235" :
+           radon >  2 ? "#5bc9e1" : "#00aaad";
   }
+
+  function style(feature) {
+    return {
+      weight: 2, opacity: 1, color: "gray",
+      dashArray: "3", fillOpacity: 0.7,
+      fillColor: getColor(feature.properties.testmean)
+    };
+  }
+
+  var info = L.control();
+  info.onAdd = function() {
+    this._div = L.DomUtil.create("div", "info");
+    this.update();
+    return this._div;
+  };
+  info.update = function(props) {
+    var msg = "<h4>Highest Radon Levels</h4>";
+    if (props) {
+      if (props.zip) {
+        msg += "<b>ZIP " + props.zip + ", " + props.city + ", OH</b><br>";
+      } else {
+        msg += "<b>" + props.county + " County, OH</b><br>";
+      }
+      msg += "Average: " + props.testmean + " pCi/L<br>Tests: " + props.testcount.toLocaleString() + "<br>Max: " + props.testmax + " pCi/L";
+    }
+    this._div.innerHTML = msg;
+  };
+  info.addTo(map);
+
+  var geojson_counties, geojson_zips;
+
+  function highlightFeature(e) {
+    var layer = e.target;
+    layer.setStyle({ weight: 3, color: "#666", dashArray: "", fillOpacity: 0.85 });
+    layer.bringToFront();
+    info.update(layer.feature.properties);
+  }
+  function resetHighlight(e) {
+    geojson_counties.resetStyle(e.target);
+    geojson_zips.resetStyle(e.target);
+    info.update();
+  }
+  function onEachFeature(feature, layer) {
+    layer.on({ mouseover: highlightFeature, mouseout: resetHighlight });
+    var label = feature.properties.zip
+      ? "ZIP " + feature.properties.zip + " — " + feature.properties.testmean + " pCi/L"
+      : feature.properties.county + " County — " + feature.properties.testmean + " pCi/L";
+    layer.bindTooltip(label);
+    var url = feature.properties.url;
+    var popupLabel = feature.properties.zip
+      ? "<h6><a href='" + url + "'>ZIP " + feature.properties.zip + ", " + feature.properties.city + ", OH</a></h6>Average: " + feature.properties.testmean + " pCi/L"
+      : "<h6><a href='" + url + "'>" + feature.properties.county + " County, OH</a></h6>Average: " + feature.properties.testmean + " pCi/L";
+    layer.bindPopup(popupLabel);
+  }
+
+  geojson_counties = L.geoJson(top15counties, { style: style, onEachFeature: onEachFeature }).addTo(map);
+  geojson_zips     = L.geoJson(top15zips,     { style: style, onEachFeature: onEachFeature }).addTo(map);
+
+  // Fit to counties
+  if (geojson_counties.getLayers().length) {
+    map.fitBounds(geojson_counties.getBounds(), { padding: [20, 20] });
+  } else {
+    map.setView([40.4, -82.9], 7);
+  }
+
+  // Legend
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function() {
+    var div = L.DomUtil.create("div", "info legend");
+    var grades = [0, 2, 4, 6, 8, 10];
+    var labels = [];
+    for (var i = 0; i < grades.length; i++) {
+      var from = grades[i], to = grades[i+1];
+      labels.push('<i style="background:' + getColor(from + 1) + '"></i> ' +
+        from + (to ? "&ndash;" + (to - 0.01).toFixed(2) + " pCi/L" : "+ pCi/L"));
+    }
+    div.innerHTML = labels.join("<br>");
+    return div;
+  };
+  legend.addTo(map);
+});
 </script>
 {% endblock %}

@@ -1,42 +1,65 @@
-/* Radon in Ohio — main stylesheet */
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap");
 
-/* Navigation */
+body { background-color: #34495e; }
+main { background-color: #fff; }
+
+/* ── Nav ── */
 .w3-flat-wet-asphalt { background-color: #34495e !important; }
 .w3-flat-asbestos    { background-color: #7f8c8d !important; }
+.shadowed { box-shadow: 0 2px 8px rgba(0,0,0,0.45); }
+.name { font-family: 'Josefin Sans', sans-serif; font-weight: 400; }
+#main-logo { height: 50px; }
 
-.shadowed { box-shadow: 0 2px 4px rgba(0,0,0,.4); }
-.deep-shadowed { text-shadow: 2px 2px 6px rgba(0,0,0,.9); }
-
-/* Hero jumbotron */
-#main-jumbotron {
+/* ── Hero jumbotron ── */
+div#main-jumbotron {
+  background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
   min-height: 60vh;
-  display: flex;
-  align-items: center;
+}
+div.main-search { backdrop-filter: brightness(70%) blur(1px); }
+
+/* ── Text effects ── */
+.deep-shadowed {
+  -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.9));
+  filter: drop-shadow(6px 6px 6px rgba(0,0,0,0.9));
+}
+.reg-shadowed {
+  filter: drop-shadow(12px 12px 25px rgba(0,0,0,0.5));
+}
+.light-shadowed {
+  filter: drop-shadow(6px 6px 12px rgba(0,0,0,0.2));
 }
 
-/* Leaflet legend */
+/* ── Leaflet info + legend ── */
 .info {
   padding: 6px 8px;
   font: 14px/16px Arial, Helvetica, sans-serif;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.85);
   box-shadow: 0 0 15px rgba(0,0,0,0.2);
   border-radius: 5px;
 }
-.info h4 { margin: 0 0 5px; color: #777; }
-.legend i {
-  width: 18px;
-  height: 18px;
-  float: left;
-  margin-right: 8px;
-  opacity: 0.7;
-}
+.info h4 { margin: 0; padding: 0; color: #777; }
+.legend { text-align: left; line-height: 18px; color: #555; }
+.legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 
-/* Article spacing */
+/* ── Article spacing ── */
 .article { margin-bottom: 2rem; }
 
-/* Footer */
+/* ── Footer ── */
+footer {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: smaller;
+}
 footer a { text-decoration: none; }
 footer a:hover { text-decoration: underline; }
+
+/* ── Sponsor cards ── */
+.sponsor-card { transition: box-shadow 0.15s; }
+.sponsor-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important; }
+
+/* ── Ohio icon ── */
+.ohio-icon { height: 1.8rem; margin-right: .5em; }

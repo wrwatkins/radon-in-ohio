@@ -1,0 +1,167 @@
+/*
+Theme Name: Radon In Ohio
+Author: Warren Watkins
+Description: Radon In Ohio Theme
+Version: 0.1
+Tags: radon
+*/
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap");
+body {
+  background-color: #34495e; }
+
+main {
+  background-color: #fff; }
+
+div#main-jumbotron {
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300; }
+
+div.main-search {
+  backdrop-filter: brightness(75%) blur(1px); }
+
+div#main-query-message {
+  width: 300px; }
+
+.name {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 400; }
+
+#main-logo {
+  height: 50px; }
+
+#footer-logo {
+  height: 100px; }
+
+footer {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: smaller; }
+
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px; }
+
+.info h4 {
+  margin: 0px;
+  padding: 0px;
+  color: #777; }
+
+.legend {
+  text-align: left;
+  line-height: 18px;
+  color: #555; }
+
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.7; }
+
+.tales {
+  width: 100%; }
+
+.carousel-inner {
+  width: 100%;
+  max-height: 400px !important; }
+
+div#businesses h1 {
+  font-size: 1.5rem; }
+
+div.sponsor h2 {
+  font-size: 2rem;
+  text-decoration: none; }
+
+div.sponsor h3 {
+  font-size: 1rem; }
+
+div.sponsor-logo img {
+  width: 100px;
+  height: 100px; }
+
+div.sponsor-inline h2 {
+  font-size: 1.6rem;
+  text-decoration: none; }
+
+div.sponsor-logo-inline img {
+  width: 75px;
+  height: 75px; }
+
+div.contractor h2 {
+  font-size: 1.25rem; }
+
+div.contractor h3 {
+  font-size: 1rem; }
+
+div.contractor ul li {
+  font-size: 1rem; }
+
+div.sponsored-page img.sponsored-logo {
+  width: 100px;
+  height: 100px; }
+
+div.sponsored-page ul#social {
+  padding: 0px;
+  text-indent: 0px; }
+
+div.sponsored-page ul#social li {
+  margin: 0px;
+  text-decoration: none;
+  display: inline;
+  padding: 0px;
+  text-indent: 0px;
+  padding: 5px; }
+
+div.sponsored-page ul#social li a {
+  margin: 0px;
+  background-repeat: no-repeat;
+  width: 25px;
+  height: 25px;
+  display: inline-block;
+  font-size: 0pt; }
+
+div.sponsored-page ul#social li#social-yelp a {
+  background-image: url("../images/brands/y.png"); }
+
+div.sponsored-page ul#social li#social-twitter a {
+  background-image: url("../images/brands/t.png"); }
+
+div.sponsored-page ul#social li#social-facebook a {
+  background-image: url("../images/brands/f.png"); }
+
+div.sponsored-page ul#social li#social-nextdoor a {
+  background-image: url("../images/brands/n.png"); }
+
+div.sponsored-page ul#social li#social-google a {
+  background-image: url("../images/brands/g.png"); }
+
+div#social-ha img {
+  height: 100px; }
+
+.reg-shadowed {
+  -webkit-filter: drop-shadow(12px 12px 25px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(12px 12px 25px rgba(0, 0, 0, 0.5)); }
+
+.deep-shadowed {
+  -webkit-filter: drop-shadow(2px 2px 2px black);
+  filter: drop-shadow(6px 6px 6px black); }
+
+.light-shadowed {
+  -webkit-filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(6px 6px 12px rgba(0, 0, 0, 0.2)); }
+
+.ohio-icon {
+  height: 1.8rem;
+  margin-right: .5em; }
+
+/*# sourceMappingURL=radoninohio.css.map */
