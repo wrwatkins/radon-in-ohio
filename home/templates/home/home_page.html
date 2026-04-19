@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block meta %}
+<meta name="description" content="Search for radon levels by Ohio ZIP Code or county. Radon is the leading cause of lung cancer after smoking.">
+<meta property="og:title" content="Radon in Ohio">
+<meta property="og:description" content="Search for radon levels by Ohio ZIP Code or county.">
+<meta property="og:type" content="website">
+{% endblock %}
+
+{% block title %}Radon in Ohio — Search Radon Levels by ZIP Code or County{% endblock %}
+
+{% block content %}
+<div class="jumbotron-fluid w3-flat-asbestos text-center" id="main-jumbotron"
+     style="background-image: url('/static/images/backgrounds/columbus-1936112.jpg');
+            background-size: cover; background-position: center; min-height: 60vh;">
+  <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
+    <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
+    <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
+    <form class="form-inline mt-5 input-group-lg form-group mx-auto row justify-content-center" id="main-query-zip-form">
+      <input class="form-control input-lg" type="search" id="main-query-zip"
+             placeholder="OH ZIP Code" aria-label="Search">
+      <button class="btn btn-primary ml-2 btn-lg" id="main-query-zip-submit" type="submit">Search</button>
+    </form>
+    <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none"></small>
+  </div>
+</div>
+
+<div class="container mt-3 mb-5">
+  <div class="row">
+    <div id="main-content-column" class="col">
+
+      <div class="article">
+        <h1>Map of highest radon levels in Ohio</h1>
+        <div id="map" style="height: 400px;" class="mb-2"></div>
+        <p class="figure-caption">Data provided by Ohio Department of Health on 2020-03-01.</p>
+        {% if page.intro %}
+          <div>{{ page.intro|richtext }}</div>
+        {% else %}
+          <p>Learn about radon levels in Ohio. Enter your ZIP code to learn about radon in your neighborhood.</p>
+          <p>Any home can have a radon problem — the only way to know is to test.</p>
+          <p>Find licensed Ohio contractors for independent testing and radon mitigation.</p>
+        {% endif %}
+      </div>
+
+      <div class="article mt-4">
+        <h2>Radon levels for popular Ohio ZIP Codes</h2>
+        <p>Select any Ohio ZIP Code to learn about radon levels in that ZIP Code, city, and county.</p>
+        <table class="table table-responsive-lg table-bordered text-center">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col" class="text-left">Ohio Zip Code</th>
+              <th scope="col">Ohio City</th>
+              <th scope="col">Number of Radon Tests</th>
+              <th scope="col">Average Radon Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for zip in popular_zips %}
+            <tr>
+              <td class="text-left"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+              <td><a href="{{ zip.get_absolute_url }}">{{ zip.city }}</a></td>
+              <td>{{ zip.radon_level.testcount|default:"—" }}</td>
+              <td>
+                {% if zip.radon_level %}
+                  <span class="text-danger"><i class="fas fa-exclamation-triangle"></i>
+                  {{ zip.radon_level.testmean }} pCi/L</span>
+                {% else %}—{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="figure-caption">From Ohio Department of Health on 2020-03-01.</p>
+      </div>
+
+      <div class="article mt-4 mb-5">
+        <h2>ZIP Codes with the highest radon levels in Ohio</h2>
+        <p>Ohio has high radon potential. Select any ZIP code to learn more about radon in that area.</p>
+        <table class="table table-responsive-lg table-bordered text-center">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col" class="text-left">Ohio Zip Code</th>
+              <th scope="col">Ohio City</th>
+              <th scope="col">Number of Radon Tests</th>
+              <th scope="col">Average Radon Level</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for zip in top_zips %}
+            <tr>
+              <td class="text-left"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+              <td><a href="{{ zip.get_absolute_url }}">{{ zip.city }}</a></td>
+              <td>{{ zip.radon_level.testcount }}</td>
+              <td><span class="text-danger"><i class="fas fa-exclamation-triangle"></i>
+                  {{ zip.radon_level.testmean }} pCi/L</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="figure-caption">From Ohio Department of Health on 2020-03-01.</p>
+      </div>
+
+    </div>
+    <div id="side-bar" class="col-3 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.getElementById("main-query-zip-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    var zip = document.getElementById("main-query-zip").value.trim();
+    var msg = document.getElementById("main-query-message");
+    if (/^\d{5}$/.test(zip)) {
+      window.location.href = "/zip/" + zip + "/";
+    } else {
+      msg.textContent = "Please enter a valid 5-digit Ohio ZIP code.";
+      msg.classList.remove("d-none");
+    }
+  });
+
+  // Leaflet map — Ohio state + top county/ZIP choropleth
+  var map = L.map("map", { zoomSnap: 0.1 });
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+  map.setView([40.4, -82.9], 7);
+
+  function getColor(radon) {
+    return radon > 10 ? "#e81e25" :
+           radon > 8  ? "#f9a01b" :
+           radon > 6  ? "#fff200" :
+           radon > 4  ? "#b2d235" :
+           radon > 2  ? "#5bc9e1" : "#00aaad";
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Find a Radon Contractor in Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <h1>Licensed Radon Contractors in Ohio</h1>
+  <p>These contractors are licensed by the Ohio Department of Health to perform radon mitigation.</p>
+  {% include "partials/contractor_list.html" with contractors=contractors %}
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Radon Levels in {{ city.name }}, Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <div class="row">
+    <div class="col-lg-9">
+
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/state/ohio/">Ohio</a></li>
+          {% if city.county %}<li class="breadcrumb-item"><a href="{{ city.county.get_absolute_url }}">{{ city.county.name }} County</a></li>{% endif %}
+          <li class="breadcrumb-item active">{{ city.name }}</li>
+        </ol>
+      </nav>
+
+      <h1>Radon Levels in {{ city.name }}, Ohio</h1>
+
+      {% if city.population %}
+      <p class="text-muted">Population: {{ city.population|floatformat:0 }}</p>
+      {% endif %}
+
+      {% if zip_codes %}
+      <h2 class="mt-4">Radon by ZIP Code in {{ city.name }}</h2>
+      <table class="table table-bordered">
+        <thead class="thead-dark">
+          <tr><th>ZIP Code</th><th>Avg Radon</th><th>Tests</th><th>Max Recorded</th></tr>
+        </thead>
+        <tbody>
+          {% for z in zip_codes %}
+          <tr>
+            <td><a href="{{ z.get_absolute_url }}">{{ z.zip }}</a></td>
+            <td>{% if z.radon_level %}<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> {{ z.radon_level.testmean }} pCi/L</span>{% else %}—{% endif %}</td>
+            <td>{% if z.radon_level %}{{ z.radon_level.testcount }}{% else %}—{% endif %}</td>
+            <td>{% if z.radon_level %}{{ z.radon_level.testmax }} pCi/L{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      {% if contractors %}
+      <h2 class="mt-4">Licensed Radon Contractors in {{ city.name }}</h2>
+      {% include "partials/contractor_list.html" with contractors=contractors %}
+      {% endif %}
+
+    </div>
+    <div class="col-lg-3 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}

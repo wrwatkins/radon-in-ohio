@@ -1,0 +1,26 @@
+<div class="table-responsive">
+  <table class="table table-bordered table-sm">
+    <thead class="thead-dark">
+      <tr>
+        <th>Name / Business</th>
+        <th>City</th>
+        <th>County</th>
+        <th>Phone</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in contractors %}
+      <tr>
+        <td><a href="{{ c.get_absolute_url }}">{{ c.business|default:c.name }}</a></td>
+        <td>{{ c.city }}</td>
+        <td>{% if c.county %}{{ c.county.name }}{% else %}—{% endif %}</td>
+        <td>{% if c.phone %}<a href="tel:{{ c.phone }}">{{ c.phone }}</a>{% else %}—{% endif %}</td>
+        <td>{{ c.get_contractor_type_display }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No contractors found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

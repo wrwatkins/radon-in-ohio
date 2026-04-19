@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% block meta %}{% endblock %}
+  <title>{% block title %}Radon in Ohio{% endblock %}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/radoninohio.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark w3-flat-wet-asphalt fixed-top pt-0 pb-1 my-0 shadowed">
+      <a class="navbar-brand name" href="/"><strong>Radon in Ohio</strong></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+              data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto pt-2">
+          <li class="nav-item"><a class="nav-link" href="/what-is-radon/">What is Radon?</a></li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Radon Levels In Your Area
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/state/ohio/">Ohio State Radon Map</a>
+              <a class="dropdown-item" href="/county/franklin/">Ohio County Radon Map</a>
+              <a class="dropdown-item" href="/zip/43016/">Ohio ZIP Code Radon Map</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/testers/">Find a Radon Tester</a>
+              <a class="dropdown-item" href="/contractors/">Find a Radon Contractor</a>
+            </div>
+          </li>
+        </ul>
+        <form class="form-inline pt-2" id="query-zip-form">
+          <input class="form-control w-50" type="search" id="query-zip"
+                 placeholder="OH ZIP Code" aria-label="Search">
+          <button class="btn btn-primary ml-2" id="query-zip-submit" type="submit">Search</button>
+        </form>
+      </div>
+    </nav>
+  </header>
+
+  <main class="pt-5">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="container-fluid w3-flat-wet-asphalt pt-3 pb-1">
+    <div class="row">
+      <div class="col-md-4" id="footer-social">
+        <p class="text-white font-weight-bold h5 mb-4">Radon in Ohio</p>
+        <ul class="list-inline">
+          <li class="list-inline-item mr-3">
+            <a class="text-white" href="https://www.facebook.com/RadonInOhio">
+              <i class="fab fa-facebook fa-3x"></i>
+            </a>
+          </li>
+          <li class="list-inline-item mr-3">
+            <a class="text-white" href="https://twitter.com/RadonInOhio">
+              <i class="fab fa-twitter fa-3x"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-4 mt-3" id="footer-radon">
+        <h3 class="text-white">Radon</h3>
+        <ul class="list-unstyled">
+          <li><a class="text-white" href="https://odh.ohio.gov/know-our-programs/radon-education-and-licensing-program/welcome">Ohio Department of Health Radon Program</a></li>
+          <li><a class="text-white" href="https://www.epa.gov/radon">US EPA Radon</a></li>
+          <li><a class="text-white" href="https://ohio.radon.com/">Free Radon Test Kits for Ohio Residents</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 mt-3" id="footer-about">
+        <h3 class="text-white">Who we are</h3>
+        <ul class="list-unstyled">
+          <li><a class="text-white" href="/about/">About Radon In Ohio</a></li>
+          <li><a class="text-white" href="/privacy-policy/">Privacy policy</a></li>
+          <li><a class="text-white" href="/advertising/">Advertising</a></li>
+          <li><a class="text-white" href="/data-accuracy/">Data Accuracy</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="text-muted text-center">Copyright &copy;{% now "Y" %} Radon In Ohio</p>
+  </footer>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script src="https://kit.fontawesome.com/db681deb5b.js" crossorigin="anonymous"></script>
+  <script>
+    document.getElementById("query-zip-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var zip = document.getElementById("query-zip").value.trim();
+      if (/^\d{5}$/.test(zip)) {
+        window.location.href = "/zip/" + zip + "/";
+      }
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

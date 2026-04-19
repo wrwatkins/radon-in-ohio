@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Ohio Radon Levels by County and ZIP Code{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <h1>Ohio Radon Levels — County &amp; ZIP Code Map</h1>
+
+  <div id="map" style="height: 500px;" class="mb-3 rounded"></div>
+
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <h2>Counties with Highest Radon Levels in Ohio</h2>
+      <table class="table table-bordered table-sm">
+        <thead class="thead-dark">
+          <tr><th>County</th><th>Avg Radon</th><th>Tests</th></tr>
+        </thead>
+        <tbody>
+          {% for county in top_counties %}
+          <tr>
+            <td><a href="{{ county.get_absolute_url }}">{{ county.name }}</a></td>
+            <td><span class="text-danger">{{ county.radon_level.testmean }} pCi/L</span></td>
+            <td>{{ county.radon_level.testcount }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <h2>ZIP Codes with Highest Radon Levels in Ohio</h2>
+      <table class="table table-bordered table-sm">
+        <thead class="thead-dark">
+          <tr><th>ZIP Code</th><th>City</th><th>Avg Radon</th></tr>
+        </thead>
+        <tbody>
+          {% for zip in top_zips %}
+          <tr>
+            <td><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+            <td>{{ zip.city }}</td>
+            <td><span class="text-danger">{{ zip.radon_level.testmean }} pCi/L</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  var map = L.map("map");
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+  map.setView([40.4, -82.9], 7);
+
+  function getColor(radon) {
+    return radon > 10 ? "#e81e25" :
+           radon > 8  ? "#f9a01b" :
+           radon > 6  ? "#fff200" :
+           radon > 4  ? "#b2d235" :
+           radon > 2  ? "#5bc9e1" : "#00aaad";
+  }
+
+  var countyData = [
+    {% for county in top_counties %}
+    {% if county.geometry %}
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "{{ county.name }}",
+        "mean": {{ county.radon_level.testmean }},
+        "count": {{ county.radon_level.testcount }},
+        "url": "{{ county.get_absolute_url }}"
+      },
+      "geometry": {{ county.geometry.geojson|safe }}
+    }{% if not forloop.last %},{% endif %}
+    {% endif %}
+    {% endfor %}
+  ];
+
+  if (countyData.length) {
+    L.geoJSON({ "type": "FeatureCollection", "features": countyData }, {
+      style: function(f) {
+        return { color: "gray", weight: 1, fillOpacity: 0.7, fillColor: getColor(f.properties.mean) };
+      },
+      onEachFeature: function(f, layer) {
+        layer.bindPopup("<strong><a href='" + f.properties.url + "'>" + f.properties.name + " County</a></strong><br>Avg: " + f.properties.mean + " pCi/L");
+      }
+    }).addTo(map);
+  }
+</script>
+{% endblock %}

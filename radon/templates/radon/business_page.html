@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}{{ contractor.business|default:contractor.name }} — Radon in Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <h1>{{ contractor.business|default:contractor.name }}</h1>
+  <h5 class="text-muted">{{ contractor.get_contractor_type_display }}</h5>
+
+  <div class="card mt-3 mb-4" style="max-width: 500px;">
+    <div class="card-body">
+      <p><strong>{{ contractor.name }}</strong></p>
+      {% if contractor.address1 %}<p>{{ contractor.address1 }}{% if contractor.address2 %}<br>{{ contractor.address2 }}{% endif %}<br>{{ contractor.city }}, {{ contractor.state }} {{ contractor.zip }}</p>{% endif %}
+      {% if contractor.phone %}<p><a href="tel:{{ contractor.phone }}">{{ contractor.phone }}</a></p>{% endif %}
+      {% if contractor.website %}<p><a href="{{ contractor.website }}" rel="nofollow noopener" target="_blank">{{ contractor.website }}</a></p>{% endif %}
+      <p class="text-muted small">License: {{ contractor.license }}</p>
+    </div>
+  </div>
+
+  <a href="/contractors/" class="btn btn-secondary">Find more contractors</a>
+</div>
+{% endblock %}
