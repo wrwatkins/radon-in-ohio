@@ -12,10 +12,8 @@
   <title>{% block title %}Radon Levels in Ohio — By County &amp; ZIP Code{% endblock %} | Radon in Ohio</title>
   {% endwith %}
 
-  {% comment %} Canonical URL {% endcomment %}
   {% block canonical %}<link rel="canonical" href="https://radoninohio.com{{ request.path }}">{% endblock %}
 
-  {% comment %} Open Graph — pages override og_title / og_description / og_image in their meta block {% endcomment %}
   <meta property="og:site_name" content="Radon in Ohio">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:url" content="https://radoninohio.com{{ request.path }}">
@@ -23,11 +21,9 @@
   <meta property="og:description" content="{% block og_description %}Radon test data for every Ohio county and ZIP code. Find licensed radon contractors and testers near you.{% endblock %}">
   {% block og_image %}{% endblock %}
 
-  {% comment %} Twitter Card {% endcomment %}
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@RadonInOhio">
 
-  {% comment %} Organization + WebSite schema (global) {% endcomment %}
   <script type="application/ld+json">
   [
     {
@@ -59,11 +55,10 @@
   </script>
   {% block schema %}{% endblock %}
 
-  {% comment %} Styles — Bootstrap first, then Leaflet, then custom {% endcomment %}
-  <link rel="preconnect" href="https://maxcdn.bootstrapcdn.com">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/radoninohio.css' %}">
   {% block extra_head %}{% endblock %}
@@ -71,40 +66,42 @@
 <body>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark w3-flat-wet-asphalt fixed-top pt-0 pb-1 my-0 shadowed">
-      <a class="navbar-brand name" href="/">
-        <img id="main-logo" src="{% static 'images/logos/full-logo.svg' %}" alt="Radon in Ohio">
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse"
-              data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-              aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto pt-2">
-          <li class="nav-item"><a class="nav-link" href="/what-is-radon/">What is Radon?</a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Radon Levels In Your Area
-            </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <a class="dropdown-item" href="/state/ohio/">Ohio State Radon Map</a>
-              <a class="dropdown-item" href="/county/franklin/">Ohio County Radon Map</a>
-              <a class="dropdown-item" href="/zip/43016/">Ohio ZIP Code Radon Map</a>
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="/testers/">Find a Radon Tester</a>
-              <a class="dropdown-item" href="/contractors/">Find a Radon Contractor</a>
-            </div>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link font-weight-bold" href="/advertise/" style="color:#f39c12;">For Contractors</a>
-          </li>
-        </ul>
-        <form class="form-inline pt-2" id="query-zip-form">
-          <input class="form-control w-50" type="search" id="query-zip"
-                 placeholder="OH ZIP Code" aria-label="Search ZIP code">
-          <button class="btn btn-primary ml-2" id="query-zip-submit" type="submit">Search</button>
-        </form>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img id="main-logo" src="{% static 'images/logos/full-logo.svg' %}" alt="Radon in Ohio">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto pt-2">
+            <li class="nav-item"><a class="nav-link" href="/what-is-radon/">What is Radon?</a></li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                 data-bs-toggle="dropdown" aria-expanded="false">
+                Radon Levels In Your Area
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/state/ohio/">Ohio State Radon Map</a></li>
+                <li><a class="dropdown-item" href="/county/franklin/">Ohio County Radon Map</a></li>
+                <li><a class="dropdown-item" href="/zip/43016/">Ohio ZIP Code Radon Map</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/testers/">Find a Radon Tester</a></li>
+                <li><a class="dropdown-item" href="/contractors/">Find a Radon Contractor</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="/advertise/" style="color:var(--color-accent);">For Contractors</a>
+            </li>
+          </ul>
+          <form class="d-flex pt-2" id="query-zip-form">
+            <input class="form-control me-2" type="search" id="query-zip"
+                   placeholder="OH ZIP Code" aria-label="Search ZIP code" style="width:130px;">
+            <button class="btn btn-primary" id="query-zip-submit" type="submit">Search</button>
+          </form>
+        </div>
       </div>
     </nav>
   </header>
@@ -116,16 +113,16 @@
   <footer class="container-fluid w3-flat-wet-asphalt pt-3 pb-1">
     <div class="row">
       <div class="col-md-4" id="footer-social">
-        <p class="text-white font-weight-bold h5 mb-4">Radon in Ohio</p>
+        <p class="text-white fw-bold h5 mb-4">Radon in Ohio</p>
         <ul class="list-inline">
-          <li class="list-inline-item mr-3">
+          <li class="list-inline-item me-3">
             <a class="text-white" href="https://www.facebook.com/RadonInOhio" aria-label="Facebook">
-              <i class="fab fa-facebook fa-3x"></i>
+              <i class="fab fa-facebook fa-2x"></i>
             </a>
           </li>
-          <li class="list-inline-item mr-3">
+          <li class="list-inline-item me-3">
             <a class="text-white" href="https://twitter.com/RadonInOhio" aria-label="Twitter">
-              <i class="fab fa-twitter fa-3x"></i>
+              <i class="fab fa-twitter fa-2x"></i>
             </a>
           </li>
         </ul>
@@ -152,12 +149,10 @@
     <p class="text-muted text-center small mt-2">Copyright &copy;{% now "Y" %} Radon In Ohio. Radon data source: Ohio Department of Health.</p>
   </footer>
 
-  {% comment %} Deferred scripts — non-critical, load after paint {% endcomment %}
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js" defer></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmU6MqBVFVO4k0OwlKUH0CVMDVF9" crossorigin="anonymous" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/TAbg=" crossorigin="" defer></script>
   <script src="https://kit.fontawesome.com/db681deb5b.js" crossorigin="anonymous" defer></script>
   <script defer>
     document.addEventListener("DOMContentLoaded", function() {

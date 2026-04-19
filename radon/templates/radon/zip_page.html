@@ -75,34 +75,34 @@
       <h1>Radon Levels in ZIP Code {{ zip.zip }}, {{ zip.city }}, OH</h1>
 
       {% if radon %}
-      <div class="card mb-4 border-{% if radon.risk_level == 'high' %}danger{% elif radon.risk_level == 'elevated' %}warning{% else %}success{% endif %}">
+      <div class="card mb-4 border-{% if radon.testmean >= 4 %}danger{% elif radon.testmean >= 2 %}warning{% else %}success{% endif %}">
         <div class="card-body">
           <div class="row text-center">
-            <div class="col-md-3">
-              <h5>Average Radon</h5>
-              <p class="h2 text-danger">{{ radon.testmean }} <small>pCi/L</small></p>
+            <div class="col-md-3 border-end">
+              <p class="stat-label">Average Radon</p>
+              <p class="stat-radon {% if radon.testmean >= 4 %}risk-high{% elif radon.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} mb-0">{{ radon.testmean }}<small> pCi/L</small></p>
+            </div>
+            <div class="col-md-3 border-end">
+              <p class="stat-label">Tests Conducted</p>
+              <p class="stat-secondary mb-0">{{ radon.testcount }}</p>
+            </div>
+            <div class="col-md-3 border-end">
+              <p class="stat-label">Maximum Recorded</p>
+              <p class="stat-secondary mb-0">{{ radon.testmax }}<small> pCi/L</small></p>
             </div>
             <div class="col-md-3">
-              <h5>Tests Conducted</h5>
-              <p class="h2">{{ radon.testcount }}</p>
-            </div>
-            <div class="col-md-3">
-              <h5>Maximum Recorded</h5>
-              <p class="h2">{{ radon.testmax }} <small>pCi/L</small></p>
-            </div>
-            <div class="col-md-3">
-              <h5>EPA Action Level</h5>
-              <p class="h2 {% if radon.testmean >= 4 %}text-danger{% else %}text-success{% endif %}">4.0 <small>pCi/L</small></p>
+              <p class="stat-label">EPA Action Level</p>
+              <p class="stat-secondary {% if radon.testmean >= 4 %}risk-high{% else %}risk-low{% endif %} mb-0">4.0<small> pCi/L</small></p>
             </div>
           </div>
           {% if radon.testmean >= 4 %}
-          <div class="alert alert-danger mt-3">
-            <i class="fas fa-exclamation-triangle"></i>
+          <div class="alert alert-danger mt-3 mb-0">
+            <i class="fas fa-exclamation-triangle me-1"></i>
             The average radon level in {{ zip.zip }} exceeds the EPA action level of 4 pCi/L.
             <strong>Testing and mitigation are recommended.</strong>
           </div>
           {% endif %}
-          <p class="text-muted small mt-2">Source: {{ radon.publisher }} — {{ radon.pubdate }}</p>
+          <p class="text-muted small mt-2 mb-0">Source: {{ radon.publisher }} — {{ radon.pubdate }}</p>
         </div>
       </div>
       {% else %}
@@ -118,17 +118,27 @@
       {% if nearby_zips %}
       <h2 class="mt-4">Nearby ZIP Codes in {{ zip.county.name }} County</h2>
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="table-dark">
           <tr>
             <th>ZIP Code</th><th>City</th><th>Avg Radon</th><th>Tests</th>
           </tr>
         </thead>
         <tbody>
           {% for z in nearby_zips %}
+          {% if z.radon_level %}
+            {% if z.radon_level.testmean >= 4 %}
+            <tr class="row-risk-high">
+            {% elif z.radon_level.testmean >= 2 %}
+            <tr class="row-risk-medium">
+            {% else %}
+            <tr class="row-risk-low">
+            {% endif %}
+          {% else %}
           <tr>
+          {% endif %}
             <td><a href="{{ z.get_absolute_url }}">{{ z.zip }}</a></td>
             <td>{{ z.city }}</td>
-            <td>{% if z.radon_level %}{{ z.radon_level.testmean }} pCi/L{% else %}—{% endif %}</td>
+            <td>{% if z.radon_level %}<span class="{% if z.radon_level.testmean >= 4 %}risk-high{% elif z.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ z.radon_level.testmean }} pCi/L</span>{% else %}—{% endif %}</td>
             <td>{% if z.radon_level %}{{ z.radon_level.testcount }}{% else %}—{% endif %}</td>
           </tr>
           {% endfor %}
@@ -149,8 +159,8 @@
       {% endif %}
 
       <div class="mt-3">
-        <a href="{% url 'advertise' %}" class="btn btn-sm btn-outline-warning">
-          <i class="fas fa-star mr-1"></i>Are you a contractor? Get featured here
+        <a href="{% url 'advertise' %}" class="btn btn-sm btn-contractor-cta">
+          <i class="fas fa-star me-1"></i>Are you a contractor? Get featured here
         </a>
       </div>
 
@@ -166,8 +176,8 @@
 {% if geo_data %}
 <script>
   var map = L.map("map");
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
   }).addTo(map);
   var geojson = L.geoJSON({{ geo_data|safe }}, {
     style: { color: "#e81e25", weight: 2, fillOpacity: 0.3 }

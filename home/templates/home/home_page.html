@@ -15,10 +15,10 @@
   <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
     <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
     <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
-    <form class="form-inline mt-5 input-group-lg form-group mx-auto row justify-content-center" id="main-query-zip-form">
+    <form id="main-query-zip-form" class="mt-5 mx-auto">
       <input class="form-control input-lg" type="search" id="main-query-zip"
              placeholder="OH ZIP Code" aria-label="Search by ZIP code">
-      <button class="btn btn-primary ml-2 btn-lg" id="main-query-zip-submit" type="submit">Search</button>
+      <button class="btn btn-primary btn-lg" id="main-query-zip-submit" type="submit">Search</button>
     </form>
     <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none"></small>
     <p class="text-white mt-4 small">{{ bg_caption }}</p>
@@ -47,10 +47,10 @@
       <div class="article mt-4">
         <h2>Radon levels for popular Ohio ZIP Codes</h2>
         <p>Select any Ohio ZIP code to learn about radon levels in that area, city, and county.</p>
-        <table class="table table-responsive-lg table-bordered text-center">
-          <thead class="thead-dark">
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
             <tr>
-              <th scope="col" class="text-left">Ohio ZIP Code</th>
+              <th scope="col" class="text-start">Ohio ZIP Code</th>
               <th scope="col">Ohio City</th>
               <th scope="col">Radon Tests</th>
               <th scope="col">Average Radon Level</th>
@@ -58,14 +58,15 @@
           </thead>
           <tbody>
             {% for zip in popular_zips %}
-            <tr>
-              <td class="text-left"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+            <tr class="{% if zip.radon_level %}{% if zip.radon_level.testmean >= 4 %}row-risk-high{% elif zip.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}{% endif %}">
+              <td class="text-start"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
               <td><a href="{{ zip.get_absolute_url }}">{{ zip.city }}</a></td>
               <td>{% if zip.radon_level %}{{ zip.radon_level.testcount }}{% else %}—{% endif %}</td>
               <td>
                 {% if zip.radon_level %}
-                  <span class="text-danger"><i class="fas fa-exclamation-triangle"></i>
-                  {{ zip.radon_level.testmean }} pCi/L</span>
+                  <span class="fw-bold {% if zip.radon_level.testmean >= 4 %}risk-high{% elif zip.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">
+                    {{ zip.radon_level.testmean }} pCi/L
+                  </span>
                 {% else %}—{% endif %}
               </td>
             </tr>
@@ -80,10 +81,10 @@
       <div class="article mt-4 mb-5">
         <h2>ZIP Codes with the highest radon levels in Ohio</h2>
         <p>Ohio has high radon potential. Select any ZIP code to learn more about radon in that area.</p>
-        <table class="table table-responsive-lg table-bordered text-center">
-          <thead class="thead-dark">
+        <table class="table table-bordered text-center">
+          <thead class="table-dark">
             <tr>
-              <th scope="col" class="text-left">Ohio ZIP Code</th>
+              <th scope="col" class="text-start">Ohio ZIP Code</th>
               <th scope="col">Ohio City</th>
               <th scope="col">Radon Tests</th>
               <th scope="col">Average Radon Level</th>
@@ -91,12 +92,12 @@
           </thead>
           <tbody>
             {% for zip in top_zips %}
-            <tr>
-              <td class="text-left"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+            <tr class="{% if zip.radon_level.testmean >= 4 %}row-risk-high{% elif zip.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
+              <td class="text-start"><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
               <td><a href="{{ zip.get_absolute_url }}">{{ zip.city }}</a></td>
               <td>{{ zip.radon_level.testcount }}</td>
-              <td><span class="text-danger"><i class="fas fa-exclamation-triangle"></i>
-                  {{ zip.radon_level.testmean }} pCi/L</span></td>
+              <td><span class="fw-bold {% if zip.radon_level.testmean >= 4 %}risk-high{% elif zip.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">
+                {{ zip.radon_level.testmean }} pCi/L</span></td>
             </tr>
             {% endfor %}
           </tbody>
@@ -115,7 +116,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Hero search form
   document.getElementById("main-query-zip-form").addEventListener("submit", function(e) {
     e.preventDefault();
     var zip = document.getElementById("main-query-zip").value.trim();
@@ -128,10 +128,9 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  // ── Choropleth map ────────────────────────────────────────────────────────
   var map = L.map("map", { zoomSnap: 0.1 });
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
   }).addTo(map);
 
   var top15counties = {{ geojson_counties|safe }};
@@ -203,14 +202,12 @@ document.addEventListener("DOMContentLoaded", function() {
   geojson_counties = L.geoJson(top15counties, { style: style, onEachFeature: onEachFeature }).addTo(map);
   geojson_zips     = L.geoJson(top15zips,     { style: style, onEachFeature: onEachFeature }).addTo(map);
 
-  // Fit to counties
   if (geojson_counties.getLayers().length) {
     map.fitBounds(geojson_counties.getBounds(), { padding: [20, 20] });
   } else {
     map.setView([40.4, -82.9], 7);
   }
 
-  // Legend
   var legend = L.control({ position: "bottomright" });
   legend.onAdd = function() {
     var div = L.DomUtil.create("div", "info legend");

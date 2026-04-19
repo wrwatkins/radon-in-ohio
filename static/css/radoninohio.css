@@ -1,65 +1,221 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Montserrat:wght@300;400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap");
 
-body { background-color: #34495e; }
+/* ── Design System ─────────────────────────────────────────────────────────── */
+:root {
+  --color-slate:       #2c3e50;
+  --color-slate-light: #34495e;
+  --color-slate-muted: #7f8c8d;
+  --color-risk-low:    #27ae60;
+  --color-risk-medium: #e67e22;
+  --color-risk-high:   #c0392b;
+  --color-accent:      #f39c12;
+  --color-bg:          #f8f9fa;
+  --font-heading:      'Josefin Sans', sans-serif;
+  --font-body:         'Montserrat', sans-serif;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--color-slate);
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+
 main { background-color: #fff; }
 
-/* ── Nav ── */
-.w3-flat-wet-asphalt { background-color: #34495e !important; }
-.w3-flat-asbestos    { background-color: #7f8c8d !important; }
-.shadowed { box-shadow: 0 2px 8px rgba(0,0,0,0.45); }
-.name { font-family: 'Josefin Sans', sans-serif; font-weight: 400; }
-#main-logo { height: 50px; }
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
 
-/* ── Hero jumbotron ── */
+/* ── Nav ───────────────────────────────────────────────────────────────────── */
+.w3-flat-wet-asphalt { background-color: var(--color-slate) !important; }
+.w3-flat-asbestos    { background-color: var(--color-slate-muted) !important; }
+.shadowed            { box-shadow: 0 2px 8px rgba(0,0,0,0.45); }
+#main-logo           { height: 50px; }
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
 div#main-jumbotron {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-body);
   font-weight: 300;
   min-height: 60vh;
 }
-div.main-search { backdrop-filter: brightness(70%) blur(1px); }
+div.main-search { backdrop-filter: brightness(65%) blur(2px); }
 
-/* ── Text effects ── */
 .deep-shadowed {
-  -webkit-filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.9));
-  filter: drop-shadow(6px 6px 6px rgba(0,0,0,0.9));
-}
-.reg-shadowed {
-  filter: drop-shadow(12px 12px 25px rgba(0,0,0,0.5));
-}
-.light-shadowed {
-  filter: drop-shadow(6px 6px 12px rgba(0,0,0,0.2));
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.85));
 }
 
-/* ── Leaflet info + legend ── */
+/* ── Hero search — mobile-first ────────────────────────────────────────────── */
+#main-query-zip-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+#main-query-zip {
+  width: 100%;
+  font-size: 1.1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  border: none;
+}
+#main-query-zip-submit {
+  width: 100%;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+}
+@media (min-width: 576px) {
+  #main-query-zip-form { flex-direction: row; }
+  #main-query-zip      { width: auto; flex: 1; }
+  #main-query-zip-submit { width: auto; }
+}
+
+/* ── Risk color system ─────────────────────────────────────────────────────── */
+.risk-low    { color: var(--color-risk-low)  !important; }
+.risk-medium { color: var(--color-risk-medium) !important; }
+.risk-high   { color: var(--color-risk-high) !important; }
+
+/* Table row encoding */
+tr.row-risk-high   { border-left: 4px solid var(--color-risk-high); }
+tr.row-risk-medium { border-left: 4px solid var(--color-risk-medium); }
+tr.row-risk-low    { border-left: 4px solid var(--color-risk-low); }
+
+/* ── Radon stat display ────────────────────────────────────────────────────── */
+.stat-radon {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.stat-radon small {
+  font-size: 1.1rem;
+  font-weight: 400;
+  opacity: 0.75;
+  letter-spacing: 0;
+}
+.stat-secondary {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1;
+}
+.stat-secondary small {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* ── Stat card headings ────────────────────────────────────────────────────── */
+.stat-label {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-slate-muted);
+  margin-bottom: 0.25rem;
+}
+
+/* ── Sponsor / Featured Pro cards ──────────────────────────────────────────── */
+.sponsor-card {
+  transition: box-shadow 0.15s, transform 0.15s;
+  border-left: 4px solid var(--color-accent) !important;
+}
+.sponsor-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
+  transform: translateY(-1px);
+}
+.badge-featured-pro {
+  background: var(--color-slate);
+  color: #ecf0f1;
+  font-family: var(--font-heading);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+.btn-sponsor-cta {
+  background-color: var(--color-slate);
+  border-color: var(--color-slate);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+.btn-sponsor-cta:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-slate);
+}
+
+/* ── Leaflet info + legend ─────────────────────────────────────────────────── */
 .info {
   padding: 6px 8px;
-  font: 14px/16px Arial, Helvetica, sans-serif;
-  background: rgba(255,255,255,0.85);
+  font: 14px/16px var(--font-body);
+  background: rgba(255,255,255,0.9);
   box-shadow: 0 0 15px rgba(0,0,0,0.2);
   border-radius: 5px;
 }
-.info h4 { margin: 0; padding: 0; color: #777; }
-.legend { text-align: left; line-height: 18px; color: #555; }
+.info h4 { margin: 0; padding: 0; color: var(--color-slate-muted); font-family: var(--font-heading); }
+.legend  { text-align: left; line-height: 18px; color: #555; }
 .legend i { width: 18px; height: 18px; float: left; margin-right: 8px; opacity: 0.7; }
 
-/* ── Article spacing ── */
+/* ── Article spacing ───────────────────────────────────────────────────────── */
 .article { margin-bottom: 2rem; }
 
-/* ── Footer ── */
+/* ── Footer ────────────────────────────────────────────────────────────────── */
 footer {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-body);
   font-weight: 300;
   font-size: smaller;
 }
 footer a { text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 
-/* ── Sponsor cards ── */
-.sponsor-card { transition: box-shadow 0.15s; }
-.sponsor-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important; }
+/* ── Contractor "Get Featured" CTA button ──────────────────────────────────── */
+.btn-contractor-cta {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+.btn-contractor-cta:hover {
+  background-color: var(--color-accent);
+  color: var(--color-slate);
+}
 
-/* ── Ohio icon ── */
+/* ── Ohio icon ─────────────────────────────────────────────────────────────── */
 .ohio-icon { height: 1.8rem; margin-right: .5em; }
+
+/* ── Advertise hero ────────────────────────────────────────────────────────── */
+.advertise-hero {
+  background: linear-gradient(135deg, var(--color-slate) 60%, #1a252f 100%);
+  color: #fff;
+  padding: 4rem 0;
+}
+
+/* ── Pricing cards ─────────────────────────────────────────────────────────── */
+.plan-card-popular {
+  border-color: var(--color-accent) !important;
+  border-width: 2px !important;
+}
+.plan-card-popular .card-header {
+  background-color: var(--color-accent) !important;
+  color: var(--color-slate);
+  font-family: var(--font-heading);
+}

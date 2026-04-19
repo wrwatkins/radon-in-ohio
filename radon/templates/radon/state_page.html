@@ -32,14 +32,14 @@
     <div class="col-md-6">
       <h2>Counties with Highest Radon Levels in Ohio</h2>
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="table-dark">
           <tr><th>County</th><th>Avg Radon</th><th>Tests</th></tr>
         </thead>
         <tbody>
           {% for county in top_counties %}
-          <tr>
+          <tr class="{% if county.radon_level.testmean >= 4 %}row-risk-high{% elif county.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
             <td><a href="{{ county.get_absolute_url }}">{{ county.name }}</a></td>
-            <td><span class="text-danger">{{ county.radon_level.testmean }} pCi/L</span></td>
+            <td><span class="{% if county.radon_level.testmean >= 4 %}risk-high{% elif county.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ county.radon_level.testmean }} pCi/L</span></td>
             <td>{{ county.radon_level.testcount }}</td>
           </tr>
           {% endfor %}
@@ -49,15 +49,15 @@
     <div class="col-md-6">
       <h2>ZIP Codes with Highest Radon Levels in Ohio</h2>
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="table-dark">
           <tr><th>ZIP Code</th><th>City</th><th>Avg Radon</th></tr>
         </thead>
         <tbody>
           {% for zip in top_zips %}
-          <tr>
+          <tr class="{% if zip.radon_level.testmean >= 4 %}row-risk-high{% elif zip.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
             <td><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
             <td>{{ zip.city }}</td>
-            <td><span class="text-danger">{{ zip.radon_level.testmean }} pCi/L</span></td>
+            <td><span class="{% if zip.radon_level.testmean >= 4 %}risk-high{% elif zip.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ zip.radon_level.testmean }} pCi/L</span></td>
           </tr>
           {% endfor %}
         </tbody>
@@ -70,8 +70,8 @@
 {% block extra_js %}
 <script>
   var map = L.map("map");
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
   }).addTo(map);
   map.setView([40.4, -82.9], 7);
 
