@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block title %}{{ page.title }} — Radon in Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <div class="row">
+    <div class="col-lg-9">
+      <h1>{{ page.title }}</h1>
+      <div class="article mt-3">
+        {{ page.body|richtext }}
+      </div>
+    </div>
+    <div class="col-lg-3 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}
