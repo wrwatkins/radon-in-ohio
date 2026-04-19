@@ -3,8 +3,64 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% block meta %}{% endblock %}
-  <title>{% block title %}Radon in Ohio{% endblock %}</title>
+
+  {% block meta %}
+  <meta name="description" content="Radon test data for every Ohio county and ZIP code. Find licensed radon contractors and testers near you.">
+  {% endblock %}
+
+  {% with page_title=self.title|default:'' %}
+  <title>{% block title %}Radon Levels in Ohio — By County &amp; ZIP Code{% endblock %} | Radon in Ohio</title>
+  {% endwith %}
+
+  {% comment %} Canonical URL {% endcomment %}
+  {% block canonical %}<link rel="canonical" href="https://radoninohio.com{{ request.path }}">{% endblock %}
+
+  {% comment %} Open Graph — pages override og_title / og_description / og_image in their meta block {% endcomment %}
+  <meta property="og:site_name" content="Radon in Ohio">
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:url" content="https://radoninohio.com{{ request.path }}">
+  <meta property="og:title" content="{% block og_title %}Radon Levels in Ohio — By County &amp; ZIP Code{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Radon test data for every Ohio county and ZIP code. Find licensed radon contractors and testers near you.{% endblock %}">
+  {% block og_image %}{% endblock %}
+
+  {% comment %} Twitter Card {% endcomment %}
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@RadonInOhio">
+
+  {% comment %} Organization + WebSite schema (global) {% endcomment %}
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Radon in Ohio",
+      "url": "https://radoninohio.com",
+      "logo": "https://radoninohio.com/static/img/logo.png",
+      "sameAs": [
+        "https://www.facebook.com/RadonInOhio",
+        "https://twitter.com/RadonInOhio"
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Radon in Ohio",
+      "url": "https://radoninohio.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://radoninohio.com/zip/{search_term_string}/"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+  ]
+  </script>
+  {% block schema %}{% endblock %}
+
+  {% comment %} Styles — Bootstrap first, then Leaflet, then custom {% endcomment %}
+  <link rel="preconnect" href="https://maxcdn.bootstrapcdn.com">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
         integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">
@@ -38,10 +94,13 @@
               <a class="dropdown-item" href="/contractors/">Find a Radon Contractor</a>
             </div>
           </li>
+          <li class="nav-item">
+            <a class="nav-link font-weight-bold" href="/advertise/" style="color:#f39c12;">For Contractors</a>
+          </li>
         </ul>
         <form class="form-inline pt-2" id="query-zip-form">
           <input class="form-control w-50" type="search" id="query-zip"
-                 placeholder="OH ZIP Code" aria-label="Search">
+                 placeholder="OH ZIP Code" aria-label="Search ZIP code">
           <button class="btn btn-primary ml-2" id="query-zip-submit" type="submit">Search</button>
         </form>
       </div>
@@ -58,19 +117,19 @@
         <p class="text-white font-weight-bold h5 mb-4">Radon in Ohio</p>
         <ul class="list-inline">
           <li class="list-inline-item mr-3">
-            <a class="text-white" href="https://www.facebook.com/RadonInOhio">
+            <a class="text-white" href="https://www.facebook.com/RadonInOhio" aria-label="Facebook">
               <i class="fab fa-facebook fa-3x"></i>
             </a>
           </li>
           <li class="list-inline-item mr-3">
-            <a class="text-white" href="https://twitter.com/RadonInOhio">
+            <a class="text-white" href="https://twitter.com/RadonInOhio" aria-label="Twitter">
               <i class="fab fa-twitter fa-3x"></i>
             </a>
           </li>
         </ul>
       </div>
       <div class="col-md-4 mt-3" id="footer-radon">
-        <h3 class="text-white">Radon</h3>
+        <h3 class="text-white h6">Radon Resources</h3>
         <ul class="list-unstyled">
           <li><a class="text-white" href="https://odh.ohio.gov/know-our-programs/radon-education-and-licensing-program/welcome">Ohio Department of Health Radon Program</a></li>
           <li><a class="text-white" href="https://www.epa.gov/radon">US EPA Radon</a></li>
@@ -78,30 +137,37 @@
         </ul>
       </div>
       <div class="col-md-4 mt-3" id="footer-about">
-        <h3 class="text-white">Who we are</h3>
+        <h3 class="text-white h6">Radon in Ohio</h3>
         <ul class="list-unstyled">
           <li><a class="text-white" href="/about/">About Radon In Ohio</a></li>
-          <li><a class="text-white" href="/privacy-policy/">Privacy policy</a></li>
-          <li><a class="text-white" href="/advertising/">Advertising</a></li>
+          <li><a class="text-white" href="/privacy-policy/">Privacy Policy</a></li>
+          <li><a class="text-white" href="/advertise/">Advertise With Us</a></li>
           <li><a class="text-white" href="/data-accuracy/">Data Accuracy</a></li>
+          <li><a class="text-white" href="/sitemap.xml">Sitemap</a></li>
         </ul>
       </div>
     </div>
-    <p class="text-muted text-center">Copyright &copy;{% now "Y" %} Radon In Ohio</p>
+    <p class="text-muted text-center small mt-2">Copyright &copy;{% now "Y" %} Radon In Ohio. Radon data source: Ohio Department of Health.</p>
   </footer>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  {% comment %} Deferred scripts — non-critical, load after paint {% endcomment %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js" defer></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" defer></script>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-  <script src="https://kit.fontawesome.com/db681deb5b.js" crossorigin="anonymous"></script>
-  <script>
-    document.getElementById("query-zip-form").addEventListener("submit", function(e) {
-      e.preventDefault();
-      var zip = document.getElementById("query-zip").value.trim();
-      if (/^\d{5}$/.test(zip)) {
-        window.location.href = "/zip/" + zip + "/";
+          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="" defer></script>
+  <script src="https://kit.fontawesome.com/db681deb5b.js" crossorigin="anonymous" defer></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", function() {
+      var form = document.getElementById("query-zip-form");
+      if (form) {
+        form.addEventListener("submit", function(e) {
+          e.preventDefault();
+          var zip = document.getElementById("query-zip").value.trim();
+          if (/^\d{5}$/.test(zip)) {
+            window.location.href = "/zip/" + zip + "/";
+          }
+        });
       }
     });
   </script>

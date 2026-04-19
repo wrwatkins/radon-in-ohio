@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for a Sponsored Listing — Radon in Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4" style="max-width:780px;">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'advertise' %}">Advertise</a></li>
+      <li class="breadcrumb-item active">Apply</li>
+    </ol>
+  </nav>
+
+  <h1 class="mb-1">Create Your Sponsored Listing</h1>
+  <p class="text-muted mb-4">Fill in your business details below. You'll be redirected to our secure checkout (powered by Stripe) to complete payment. Your listing goes live as soon as payment is confirmed.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    {% comment %} Plan selection first so users see what they chose from the pricing page {% endcomment %}
+    <div class="card mb-4">
+      <div class="card-header bg-warning font-weight-bold">Step 1 — Choose Your Plan</div>
+      <div class="card-body">
+        {% for radio in form.plan %}
+        <div class="form-check mb-2">
+          {{ radio.tag }}
+          <label class="form-check-label ml-1" for="{{ radio.id_for_label }}">
+            {% if radio.choice_value == "starter" %}
+              <strong>Starter — $49/month</strong> &mdash; 1 county featured placement, basic profile
+            {% elif radio.choice_value == "pro" %}
+              <strong>Pro — $99/month</strong> &mdash; Up to 10 counties, logo &amp; photo, full profile <span class="badge badge-warning">Most Popular</span>
+            {% else %}
+              <strong>Premier — $199/month</strong> &mdash; Statewide, top placement, priority setup
+            {% endif %}
+          </label>
+        </div>
+        {% endfor %}
+        {% if form.plan.errors %}<div class="text-danger small">{{ form.plan.errors }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-light font-weight-bold">Step 2 — Business Information</div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <label for="{{ form.business_name.id_for_label }}">{{ form.business_name.label }} <span class="text-danger">*</span></label>
+            {{ form.business_name }}
+            {% if form.business_name.errors %}<div class="text-danger small">{{ form.business_name.errors }}</div>{% endif %}
+          </div>
+          <div class="form-group col-md-4">
+            <label for="{{ form.contractor_type.id_for_label }}">{{ form.contractor_type.label }} <span class="text-danger">*</span></label>
+            {{ form.contractor_type }}
+            {% if form.contractor_type.errors %}<div class="text-danger small">{{ form.contractor_type.errors }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="{{ form.owner_name.id_for_label }}">{{ form.owner_name.label }} <span class="text-danger">*</span></label>
+            {{ form.owner_name }}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="{{ form.license.id_for_label }}">{{ form.license.label }}</label>
+            {{ form.license }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.vanity_url_name.id_for_label }}">{{ form.vanity_url_name.label }} <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text text-muted small">radoninohio.com/business/</span>
+            </div>
+            {{ form.vanity_url_name }}
+          </div>
+          <small class="form-text text-muted">{{ form.vanity_url_name.help_text }}</small>
+          {% if form.vanity_url_name.errors %}<div class="text-danger small">{{ form.vanity_url_name.errors }}</div>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-light font-weight-bold">Step 3 — Contact Details</div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="{{ form.email.id_for_label }}">{{ form.email.label }} <span class="text-danger">*</span></label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }} <span class="text-danger">*</span></label>
+            {{ form.phone }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="{{ form.address1.id_for_label }}">{{ form.address1.label }}</label>
+          {{ form.address1 }}
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>
+            {{ form.city }}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="{{ form.zip.id_for_label }}">{{ form.zip.label }}</label>
+            {{ form.zip }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-light font-weight-bold">Step 4 — Service Counties</div>
+      <div class="card-body">
+        <p class="text-muted small">{{ form.service_counties.help_text }}</p>
+        <div style="max-height:260px;overflow-y:auto;border:1px solid #dee2e6;padding:10px;border-radius:4px;">
+          <div class="row">
+            {% for checkbox in form.service_counties %}
+            <div class="col-md-4">
+              <div class="form-check">
+                {{ checkbox.tag }}
+                <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-light font-weight-bold">Step 5 — Web Presence</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="{{ form.website.id_for_label }}">{{ form.website.label }}</label>
+          {{ form.website }}
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="{{ form.url_google.id_for_label }}">{{ form.url_google.label }}</label>
+            {{ form.url_google }}
+          </div>
+          <div class="form-group col-md-6">
+            <label for="{{ form.url_yelp.id_for_label }}">{{ form.url_yelp.label }}</label>
+            {{ form.url_yelp }}
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="{{ form.url_facebook.id_for_label }}">{{ form.url_facebook.label }}</label>
+          {{ form.url_facebook }}
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header bg-light font-weight-bold">Step 6 — Your Business Profile</div>
+      <div class="card-body">
+        <div class="form-group">
+          <label for="{{ form.about.id_for_label }}">{{ form.about.label }}</label>
+          {{ form.about }}
+          <small class="form-text text-muted">{{ form.about.help_text }}</small>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="{{ form.call_to_action.id_for_label }}">{{ form.call_to_action.label }}</label>
+            {{ form.call_to_action }}
+            <small class="form-text text-muted">{{ form.call_to_action.help_text }}</small>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="{{ form.hours.id_for_label }}">{{ form.hours.label }}</label>
+            {{ form.hours }}
+            <small class="form-text text-muted">{{ form.hours.help_text }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4 border-warning">
+      <div class="card-body text-center">
+        <p class="mb-2 text-muted small">
+          <i class="fas fa-lock mr-1"></i>
+          Payment is processed securely by Stripe. We never store your card details.
+        </p>
+        <button type="submit" class="btn btn-warning btn-lg px-5">
+          <i class="fas fa-credit-card mr-2"></i>Continue to Secure Checkout
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Pre-select plan if passed in query string
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var plan = params.get("plan");
+  if (plan) {
+    var radio = document.querySelector('input[name="plan"][value="' + plan + '"]');
+    if (radio) radio.checked = true;
+  }
+  // Apply Bootstrap form-control class to all text inputs
+  document.querySelectorAll('input[type=text], input[type=email], input[type=url], input[type=tel], select, textarea').forEach(function(el) {
+    el.classList.add('form-control');
+  });
+})();
+</script>
+{% endblock %}

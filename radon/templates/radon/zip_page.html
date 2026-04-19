@@ -1,11 +1,62 @@
 {% extends "base.html" %}
 
+{% block title %}Radon Levels in ZIP Code {{ zip.zip }}, {{ zip.city }}, Ohio{% endblock %}
+
+{% block og_title %}Radon Levels in ZIP Code {{ zip.zip }}, {{ zip.city }}, OH{% endblock %}
+{% block og_description %}Average radon level in {{ zip.zip }} ({{ zip.city }}, OH): {% if radon %}{{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests{% else %}no test data available{% endif %}. Compare nearby ZIP codes and find licensed radon professionals.{% endblock %}
+
 {% block meta %}
-<meta name="description" content="Radon levels for ZIP code {{ zip.zip }}, {{ zip.city }}, Ohio. Average radon: {% if radon %}{{ radon.testmean }} pCi/L{% else %}no data{% endif %}.">
-<meta property="og:title" content="Radon Levels — ZIP Code {{ zip.zip }}, {{ zip.city }}, OH">
+<meta name="description" content="Average radon level in {{ zip.zip }} ({{ zip.city }}, OH): {% if radon %}{{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests{% else %}no test data available{% endif %}. Compare nearby ZIP codes and find licensed radon professionals.">
 {% endblock %}
 
-{% block title %}Radon Levels — ZIP Code {{ zip.zip }}, {{ zip.city }}, Ohio{% endblock %}
+{% block schema %}
+{% if radon %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Radon Test Data — ZIP Code {{ zip.zip }}, {{ zip.city }}, Ohio",
+  "description": "Radon test statistics for {{ zip.zip }} ({{ zip.city }}, OH). Average: {{ radon.testmean }} pCi/L across {{ radon.testcount }} tests.",
+  "url": "https://radoninohio.com/zip/{{ zip.zip }}/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ radon.publisher }}",
+    "url": "{{ radon.pubsource }}"
+  },
+  "temporalCoverage": "{{ radon.pub_represents_period }}",
+  "spatialCoverage": {
+    "@type": "Place",
+    "name": "{{ zip.zip }}, {{ zip.city }}, Ohio",
+    "address": {
+      "@type": "PostalAddress",
+      "postalCode": "{{ zip.zip }}",
+      "addressLocality": "{{ zip.city }}",
+      "addressRegion": "OH",
+      "addressCountry": "US"
+    }
+  },
+  "variableMeasured": [
+    { "@type": "PropertyValue", "name": "Mean Radon Level", "value": "{{ radon.testmean }}", "unitCode": "pCi/L" },
+    { "@type": "PropertyValue", "name": "Maximum Radon Level", "value": "{{ radon.testmax }}", "unitCode": "pCi/L" },
+    { "@type": "PropertyValue", "name": "Test Count", "value": {{ radon.testcount }} }
+  ]
+}
+</script>
+{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://radoninohio.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Ohio", "item": "https://radoninohio.com/state/ohio/" }{% if zip.county %},
+    { "@type": "ListItem", "position": 3, "name": "{{ zip.county.name }} County", "item": "https://radoninohio.com{{ zip.county.get_absolute_url }}" },
+    { "@type": "ListItem", "position": 4, "name": "ZIP {{ zip.zip }}", "item": "https://radoninohio.com/zip/{{ zip.zip }}/" }{% else %},
+    { "@type": "ListItem", "position": 3, "name": "ZIP {{ zip.zip }}", "item": "https://radoninohio.com/zip/{{ zip.zip }}/" }{% endif %}
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5 pt-4">
@@ -85,10 +136,23 @@
       </table>
       {% endif %}
 
+      {% if sponsors %}
+      <h2 class="mt-4">Featured Radon Professionals Near {{ zip.zip }}</h2>
+      {% for listing in sponsors %}
+        {% include "partials/sponsor_card.html" with listing=listing %}
+      {% endfor %}
+      {% endif %}
+
       {% if contractors %}
       <h2 class="mt-4">Licensed Radon Contractors Near {{ zip.zip }}</h2>
       {% include "partials/contractor_list.html" with contractors=contractors %}
       {% endif %}
+
+      <div class="mt-3">
+        <a href="{% url 'advertise' %}" class="btn btn-sm btn-outline-warning">
+          <i class="fas fa-star mr-1"></i>Are you a contractor? Get featured here
+        </a>
+      </div>
 
     </div>
     <div class="col-lg-3 d-none d-lg-block">

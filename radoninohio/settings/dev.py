@@ -4,8 +4,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
-INSTALLED_APPS += ["django.contrib.staticfiles"]
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"

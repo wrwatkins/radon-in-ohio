@@ -1,6 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Ohio Radon Levels by County and ZIP Code{% endblock %}
+{% block title %}Ohio Radon Levels by County and ZIP Code — Statewide Radon Map{% endblock %}
+
+{% block og_title %}Ohio Radon Levels — County &amp; ZIP Code Map{% endblock %}
+{% block og_description %}Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. See which areas have the highest radon risk and find licensed radon professionals near you.{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. See which areas have the highest radon risk and find licensed radon professionals near you.">
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://radoninohio.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Ohio Radon Levels", "item": "https://radoninohio.com/state/ohio/" }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5 pt-4">

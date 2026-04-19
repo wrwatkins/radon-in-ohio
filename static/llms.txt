@@ -1,0 +1,37 @@
+# Radon in Ohio
+
+> Radon in Ohio is an authoritative data resource providing radon test statistics for every Ohio county and ZIP code, published using data from the Ohio Department of Health Radon Education and Licensing Program. The site helps Ohio homeowners understand their radon risk and find licensed radon professionals.
+
+## Data
+
+- [Ohio Radon Levels by County and ZIP](/state/ohio/) — statewide overview with county and ZIP rankings
+- [Find a Radon Contractor](/contractors/) — licensed radon mitigation professionals in Ohio
+- [Find a Radon Tester](/testers/) — licensed radon testing professionals in Ohio
+
+## Key Facts
+
+- Radon is the second-leading cause of lung cancer in the United States (EPA)
+- The EPA action level is 4.0 pCi/L — testing is recommended for all homes
+- Ohio has one of the highest radon risk profiles in the US
+- Data source: Ohio Department of Health Radon Education and Licensing Program, 2020
+
+## County Pages
+
+Each Ohio county page at /county/{county-name}/ includes:
+- Average radon level (pCi/L) across all tests in that county
+- Total test count, minimum, and maximum recorded values
+- EPA radon zone classification
+- List of ZIP codes with individual radon statistics
+- Licensed radon contractors serving that county
+
+## ZIP Code Pages
+
+Each Ohio ZIP code page at /zip/{zip}/ includes:
+- Average, minimum, and maximum radon levels from all recorded tests
+- Risk classification (high: ≥8 pCi/L, elevated: ≥4 pCi/L, low: <4 pCi/L)
+- Interactive map of the ZIP code boundary
+- Nearby ZIP code comparison table
+
+## About This Site
+
+Radon in Ohio is operated independently. Contractor listings are provided by the Ohio Department of Health and are updated periodically. Sponsored listings are clearly marked as advertisements.

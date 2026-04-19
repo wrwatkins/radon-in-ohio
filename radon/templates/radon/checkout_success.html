@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You — You're Listed! — Radon in Ohio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4 text-center" style="max-width:640px;">
+  <div class="mb-4">
+    <i class="fas fa-check-circle fa-5x text-success"></i>
+  </div>
+  <h1 class="mb-3">You're In!</h1>
+  <p class="lead">Your payment was confirmed and your sponsored listing is now <strong>live</strong>.</p>
+  <p class="text-muted">Homeowners searching for radon services in your service area will see your listing at the top of county, city, and ZIP code pages.</p>
+
+  <div class="card bg-light mt-4 mb-4">
+    <div class="card-body">
+      <h5>What's next?</h5>
+      <ul class="list-unstyled text-left mt-3">
+        <li class="mb-2"><i class="fas fa-upload text-primary mr-2"></i><strong>Add your logo &amp; photo</strong> — Email us at <a href="mailto:hello@radoninohio.com">hello@radoninohio.com</a> to upload your business images.</li>
+        <li class="mb-2"><i class="fas fa-map-marker-alt text-primary mr-2"></i><strong>Expand your service area</strong> — Need to add or remove counties? Just reach out.</li>
+        <li class="mb-2"><i class="fas fa-receipt text-primary mr-2"></i><strong>Billing portal</strong> — Manage your subscription, update payment info, or cancel anytime through your Stripe billing portal (link sent to your email).</li>
+      </ul>
+    </div>
+  </div>
+
+  <a href="/" class="btn btn-warning btn-lg px-5">Back to Home</a>
+</div>
+{% endblock %}

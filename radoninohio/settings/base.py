@@ -28,7 +28,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
     "django.contrib.gis",
+    "django.contrib.postgres",
 ]
 
 MIDDLEWARE = [
@@ -92,6 +94,13 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
+STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
+STRIPE_PUBLIC_KEY = config("STRIPE_PUBLIC_KEY", default="")
+STRIPE_PRICE_STARTER = config("STRIPE_PRICE_STARTER", default="")
+STRIPE_PRICE_PRO = config("STRIPE_PRICE_PRO", default="")
+STRIPE_PRICE_PREMIER = config("STRIPE_PRICE_PREMIER", default="")
 
 WAGTAIL_SITE_NAME = "Radon in Ohio"
 WAGTAILADMIN_BASE_URL = "https://radoninohio.com"

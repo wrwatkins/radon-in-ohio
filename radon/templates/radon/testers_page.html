@@ -1,11 +1,40 @@
 {% extends "base.html" %}
 
-{% block title %}Find a Radon Tester in Ohio{% endblock %}
+{% block title %}Find a Licensed Radon Tester in Ohio — Home Testing Professionals{% endblock %}
+
+{% block og_title %}Find a Licensed Radon Tester in Ohio{% endblock %}
+{% block og_description %}Browse 670+ Ohio-licensed radon testing professionals. Get your home tested by a certified radon tester licensed by the Ohio Department of Health.{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Browse Ohio-licensed radon testing professionals by county. All listed testers are certified by the Ohio Department of Health Radon Education and Licensing Program.">
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5 pt-4">
-  <h1>Licensed Radon Testers in Ohio</h1>
-  <p>These testers are licensed by the Ohio Department of Health to conduct radon testing.</p>
-  {% include "partials/contractor_list.html" with contractors=testers %}
+  <div class="row">
+    <div class="col-lg-9">
+      <h1>Licensed Radon Testers in Ohio</h1>
+      <p>These testers are licensed by the Ohio Department of Health to conduct radon testing in Ohio homes and buildings.</p>
+
+      {% if sponsors %}
+      <h2 class="mt-4">Featured Radon Testing Companies</h2>
+      {% for listing in sponsors %}
+        {% include "partials/sponsor_card.html" with listing=listing %}
+      {% endfor %}
+      {% endif %}
+
+      <h2 class="mt-4">All Licensed Testers</h2>
+      {% include "partials/contractor_list.html" with contractors=testers %}
+
+      <div class="mt-3">
+        <a href="{% url 'advertise' %}" class="btn btn-sm btn-outline-warning">
+          <i class="fas fa-star mr-1"></i>Are you a radon tester? Get featured here
+        </a>
+      </div>
+    </div>
+    <div class="col-lg-3 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+    </div>
+  </div>
 </div>
 {% endblock %}

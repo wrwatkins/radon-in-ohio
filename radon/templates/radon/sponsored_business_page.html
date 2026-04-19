@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}{{ listing.business_name }} — Ohio Radon {{ listing.get_contractor_type_display }}{% endblock %}
+
+{% block meta %}
+<meta name="description" content="{{ listing.business_name }} is a licensed Ohio radon {{ listing.get_contractor_type_display|lower }} serving {% for county in listing.service_counties.all %}{{ county.name }}{% if not forloop.last %}, {% endif %}{% endfor %} County{% if listing.about %} — {{ listing.about|truncatewords:20 }}{% endif %}.">
+<meta property="og:title" content="{{ listing.business_name }} — Radon in Ohio">
+{% if listing.picture %}<meta property="og:image" content="{{ listing.picture.url }}">{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ listing.business_name }}",
+  "telephone": "{{ listing.phone }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ listing.address1 }}",
+    "addressLocality": "{{ listing.city }}",
+    "addressRegion": "OH",
+    "postalCode": "{{ listing.zip }}",
+    "addressCountry": "US"
+  }{% if listing.website %},
+  "url": "{{ listing.website }}"{% endif %}{% if listing.about %},
+  "description": "{{ listing.about|escapejs }}"{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+  <div class="row">
+    <div class="col-lg-8">
+
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/contractors/">Contractors</a></li>
+          <li class="breadcrumb-item active">{{ listing.business_name }}</li>
+        </ol>
+      </nav>
+
+      {% comment %} Header {% endcomment %}
+      <div class="d-flex align-items-center mb-4">
+        {% if listing.logo %}
+        <img src="{{ listing.logo.url }}" alt="{{ listing.business_name }} logo" class="mr-4" style="max-height:80px;max-width:180px;object-fit:contain;">
+        {% endif %}
+        <div>
+          <span class="badge badge-warning text-dark mb-1">Sponsored Listing</span>
+          <h1 class="mb-1">{{ listing.business_name }}</h1>
+          <p class="text-muted mb-0">{{ listing.get_contractor_type_display }} &mdash; {{ listing.city }}, OH {{ listing.zip }}</p>
+          {% if listing.ratings %}
+          <p class="mb-0"><i class="fas fa-star text-warning"></i> {{ listing.ratings }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if listing.picture %}
+      <img src="{{ listing.picture.url }}" alt="{{ listing.business_name }}" class="img-fluid rounded mb-4" style="max-height:350px;width:100%;object-fit:cover;">
+      {% endif %}
+
+      {% comment %} CTA bar {% endcomment %}
+      <div class="card border-warning mb-4">
+        <div class="card-body d-flex flex-wrap align-items-center justify-content-between">
+          <div>
+            {% if listing.phone %}
+            <p class="mb-1 h5"><i class="fas fa-phone text-success mr-2"></i><a href="tel:{{ listing.phone }}">{{ listing.phone }}</a></p>
+            {% endif %}
+            {% if listing.hours %}
+            <p class="mb-0 text-muted small"><i class="far fa-clock mr-1"></i>{{ listing.hours }}</p>
+            {% endif %}
+          </div>
+          <div class="mt-2 mt-md-0">
+            {% if listing.website %}
+            <a href="{{ listing.website }}" rel="nofollow noopener" target="_blank" class="btn btn-warning mr-2">{{ listing.call_to_action }}</a>
+            {% endif %}
+            {% if listing.phone %}
+            <a href="tel:{{ listing.phone }}" class="btn btn-outline-success">Call Now</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      {% if listing.about %}
+      <h2>About {{ listing.business_name }}</h2>
+      <p>{{ listing.about|linebreaksbr }}</p>
+      {% endif %}
+
+      {% comment %} Service area {% endcomment %}
+      {% if listing.service_counties.all %}
+      <h3 class="mt-4">Service Area</h3>
+      <p>
+        {% for county in listing.service_counties.all %}
+        <a href="{{ county.get_absolute_url }}" class="badge badge-secondary mr-1 mb-1" style="font-size:.85rem;">{{ county.name }} County</a>
+        {% endfor %}
+      </p>
+      {% endif %}
+
+      {% comment %} Social links {% endcomment %}
+      {% if listing.url_google or listing.url_yelp or listing.url_facebook or listing.url_nextdoor %}
+      <h3 class="mt-4">Find Us Online</h3>
+      <div class="d-flex flex-wrap">
+        {% if listing.url_google %}
+        <a href="{{ listing.url_google }}" rel="nofollow noopener" target="_blank" class="btn btn-sm btn-outline-secondary mr-2 mb-2">
+          <i class="fab fa-google mr-1"></i>Google Business
+        </a>
+        {% endif %}
+        {% if listing.url_yelp %}
+        <a href="{{ listing.url_yelp }}" rel="nofollow noopener" target="_blank" class="btn btn-sm btn-outline-secondary mr-2 mb-2">
+          <i class="fab fa-yelp mr-1"></i>Yelp
+        </a>
+        {% endif %}
+        {% if listing.url_facebook %}
+        <a href="{{ listing.url_facebook }}" rel="nofollow noopener" target="_blank" class="btn btn-sm btn-outline-secondary mr-2 mb-2">
+          <i class="fab fa-facebook mr-1"></i>Facebook
+        </a>
+        {% endif %}
+        {% if listing.url_nextdoor %}
+        <a href="{{ listing.url_nextdoor }}" rel="nofollow noopener" target="_blank" class="btn btn-sm btn-outline-secondary mr-2 mb-2">
+          <i class="fas fa-home mr-1"></i>Nextdoor
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% comment %} Contact details {% endcomment %}
+      <h3 class="mt-4">Contact &amp; Location</h3>
+      <div class="card bg-light" style="max-width:420px;">
+        <div class="card-body">
+          {% if listing.address1 %}
+          <p class="mb-1">
+            <i class="fas fa-map-marker-alt text-danger mr-2"></i>
+            {{ listing.address1 }}{% if listing.address2 %}, {{ listing.address2 }}{% endif %}<br>
+            <span class="ml-4">{{ listing.city }}, OH {{ listing.zip }}</span>
+          </p>
+          {% endif %}
+          {% if listing.phone %}
+          <p class="mb-1"><i class="fas fa-phone mr-2"></i><a href="tel:{{ listing.phone }}">{{ listing.phone }}</a></p>
+          {% endif %}
+          {% if listing.website %}
+          <p class="mb-1"><i class="fas fa-globe mr-2"></i><a href="{{ listing.website }}" rel="nofollow noopener" target="_blank">{{ listing.website }}</a></p>
+          {% endif %}
+          {% if listing.license %}
+          <p class="mb-0 text-muted small"><i class="fas fa-id-card mr-2"></i>Ohio License: {{ listing.license }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+    <div class="col-lg-4 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+      <div class="card mt-3">
+        <div class="card-body text-center">
+          <p class="mb-2 small text-muted">Are you a radon contractor?</p>
+          <a href="{% url 'advertise' %}" class="btn btn-warning btn-sm btn-block">Get Your Business Listed</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

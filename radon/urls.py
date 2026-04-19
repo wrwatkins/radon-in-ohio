@@ -10,4 +10,8 @@ urlpatterns = [
     path("business/<str:slug>/", views.business_view, name="business"),
     path("contractors/", views.contractors_view, name="contractors"),
     path("testers/", views.testers_view, name="testers"),
+    path("advertise/", views.advertise_view, name="advertise"),
+    path("advertise/apply/", views.advertise_apply_view, name="advertise_apply"),
+    path("advertise/success/", views.checkout_success_view, name="checkout_success"),
+    path("stripe/webhook/", views.stripe_webhook_view, name="stripe_webhook"),
 ]
