@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.utils import timezone
 
 
 class County(models.Model):
@@ -145,3 +146,96 @@ class Contractor(models.Model):
 
     def get_absolute_url(self):
         return f"/business/{self.license.lower()}/"
+
+
+class SponsoredListing(models.Model):
+    MITIGATOR = "mitigator"
+    TESTER = "tester"
+    BOTH = "both"
+    TYPE_CHOICES = [
+        (MITIGATOR, "Radon Mitigator"),
+        (TESTER, "Radon Tester"),
+        (BOTH, "Tester & Mitigator"),
+    ]
+
+    # Identity
+    contractor = models.OneToOneField(
+        Contractor, on_delete=models.SET_NULL, null=True, blank=True, related_name="sponsored_listing"
+    )
+    license = models.CharField(max_length=10, blank=True)
+    contractor_type = models.CharField(max_length=100, choices=TYPE_CHOICES)
+    business_name = models.CharField(max_length=100)
+    vanity_url_name = models.SlugField(max_length=150, unique=True)
+    owner_name = models.CharField(max_length=100, blank=True)
+
+    # Contact
+    address1 = models.CharField(max_length=100, blank=True)
+    address2 = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    state = models.CharField(max_length=2, default="OH")
+    zip = models.CharField(max_length=10, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True)
+
+    # Media (uploaded to S3 in production)
+    logo = models.ImageField(upload_to="sponsor-logos/", null=True, blank=True)
+    picture = models.ImageField(upload_to="sponsor-photos/", null=True, blank=True)
+
+    # Web presence
+    website = models.URLField(blank=True)
+    url_yelp = models.URLField(blank=True)
+    url_facebook = models.URLField(blank=True)
+    url_nextdoor = models.URLField(blank=True)
+    url_google = models.URLField(blank=True)
+
+    # Profile content
+    about = models.TextField(max_length=1000, blank=True)
+    call_to_action = models.CharField(max_length=100, blank=True, default="Contact Us")
+    hours = models.CharField(max_length=150, blank=True)
+    ratings = models.CharField(max_length=100, blank=True)
+
+    # Service area targeting (M2M — the revenue differentiator)
+    service_zip_codes = models.ManyToManyField(
+        ZipCode, blank=True, related_name="sponsored_listings"
+    )
+    service_counties = models.ManyToManyField(
+        County, blank=True, related_name="sponsored_listings"
+    )
+    service_cities = models.ManyToManyField(
+        City, blank=True, related_name="sponsored_listings"
+    )
+
+    # Geo
+    lat = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    lng = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+
+    # Stripe subscription
+    stripe_customer_id = models.CharField(max_length=100, blank=True)
+    stripe_subscription_id = models.CharField(max_length=100, blank=True)
+    eff_date_start = models.DateField(null=True, blank=True)
+    eff_date_end = models.DateField(null=True, blank=True)
+
+    # Admin controls
+    is_approved = models.BooleanField(default=False)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["business_name"]
+
+    def __str__(self):
+        return f"{self.business_name} (sponsored)"
+
+    def get_absolute_url(self):
+        return f"/business/{self.vanity_url_name}/"
+
+    @property
+    def is_active(self):
+        today = timezone.now().date()
+        return (
+            self.is_approved
+            and self.eff_date_start is not None
+            and self.eff_date_end is not None
+            and self.eff_date_start <= today <= self.eff_date_end
+        )
