@@ -51,6 +51,8 @@
       <div id="map" style="height: 400px;" class="mb-3 rounded"></div>
       {% endif %}
 
+      {% include "partials/amazon_ad.html" %}
+
       {% if zip_codes %}
       <h2 class="mt-4">Radon by ZIP Code in {{ county.name }} County</h2>
       <table class="table table-bordered table-sm">

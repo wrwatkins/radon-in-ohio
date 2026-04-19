@@ -62,6 +62,8 @@
       <div id="map" style="height: 350px;" class="mb-3 rounded"></div>
       {% endif %}
 
+      {% include "partials/amazon_ad.html" %}
+
       {% if nearby_zips %}
       <h2 class="mt-4">Nearby ZIP Codes in {{ zip.county.name }} County</h2>
       <table class="table table-bordered table-sm">
