@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import stripe
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -88,6 +89,15 @@ def county_view(request, county_name):
     })
 
 
+def county_index_view(request):
+    counties = (
+        County.objects.filter(state="OH")
+        .select_related("radon_level")
+        .order_by("name")
+    )
+    return render(request, "radon/county_index_page.html", {"counties": counties})
+
+
 def city_view(request, city_name):
     city_name_normalized = city_name.replace("-", " ")
     city = get_object_or_404(City, name__iexact=city_name_normalized, state="OH")
@@ -124,9 +134,27 @@ def state_view(request, state_name):
         .filter(radon_level__testcount__gte=5)
         .order_by("-radon_level__testmean")[:15]
     )
+
+    # Build GeoJSON for choropleth — only counties with geometry
+    county_features = []
+    for c in top_counties:
+        if c.geometry:
+            county_features.append({
+                "type": "Feature",
+                "properties": {
+                    "name": c.name,
+                    "mean": float(c.radon_level.testmean),
+                    "count": c.radon_level.testcount,
+                    "url": c.get_absolute_url(),
+                },
+                "geometry": json.loads(c.geometry.geojson),
+            })
+    geo_counties = json.dumps({"type": "FeatureCollection", "features": county_features}) if county_features else None
+
     return render(request, "radon/state_page.html", {
         "top_counties": top_counties,
         "top_zips": top_zips,
+        "geo_counties": geo_counties,
     })
 
 
@@ -150,13 +178,24 @@ def contractors_view(request):
     sponsors = _active_sponsors().filter(
         contractor_type__in=[SponsoredListing.MITIGATOR, SponsoredListing.BOTH]
     )
-    contractors = Contractor.objects.filter(
+    county_filter = request.GET.get("county", "").strip()
+    qs = Contractor.objects.filter(
         contractor_type__in=[Contractor.MITIGATOR, Contractor.BOTH],
         is_active=True,
     ).select_related("county").order_by("county__name", "name")
+    if county_filter:
+        qs = qs.filter(county__name__iexact=county_filter)
+
+    paginator = Paginator(qs, 40)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    counties = County.objects.filter(state="OH").order_by("name")
     return render(request, "radon/contractors_page.html", {
-        "contractors": contractors,
+        "contractors": page_obj,
+        "page_obj": page_obj,
         "sponsors": sponsors,
+        "counties": counties,
+        "county_filter": county_filter,
     })
 
 
@@ -164,13 +203,24 @@ def testers_view(request):
     sponsors = _active_sponsors().filter(
         contractor_type__in=[SponsoredListing.TESTER, SponsoredListing.BOTH]
     )
-    testers = Contractor.objects.filter(
+    county_filter = request.GET.get("county", "").strip()
+    qs = Contractor.objects.filter(
         contractor_type__in=[Contractor.TESTER, Contractor.BOTH],
         is_active=True,
     ).select_related("county").order_by("county__name", "name")
+    if county_filter:
+        qs = qs.filter(county__name__iexact=county_filter)
+
+    paginator = Paginator(qs, 40)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    counties = County.objects.filter(state="OH").order_by("name")
     return render(request, "radon/testers_page.html", {
-        "testers": testers,
+        "testers": page_obj,
+        "page_obj": page_obj,
         "sponsors": sponsors,
+        "counties": counties,
+        "county_filter": county_filter,
     })
 
 
@@ -297,7 +347,6 @@ def stripe_webhook_view(request):
         sub_id = obj.get("id")
         status = obj.get("status")
         if sub_id and status == "active":
-            # Renew or reactivate — extend one year from today
             SponsoredListing.objects.filter(stripe_subscription_id=sub_id).update(
                 eff_date_end=timezone.now().date() + timedelta(days=365),
                 is_approved=True,

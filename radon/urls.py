@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("zip/<str:zip_code>/", views.zip_view, name="zip"),
+    path("county/", views.county_index_view, name="county_index"),
     path("county/<str:county_name>/", views.county_view, name="county"),
     path("city/<str:city_name>/", views.city_view, name="city"),
     path("state/<str:state_name>/", views.state_view, name="state"),

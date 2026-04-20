@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
     "django.contrib.gis",
     "django.contrib.postgres",
+    "django.contrib.humanize",
 ]
 
 MIDDLEWARE = [

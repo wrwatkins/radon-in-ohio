@@ -1,37 +1,59 @@
 # Radon in Ohio
+> Radon test data for every Ohio ZIP code and county, sourced from the Ohio Department of Health Radon Education and Licensing Program. Includes average indoor radon levels, test counts, maximum recorded values, and a directory of licensed Ohio radon professionals.
 
-> Radon in Ohio is an authoritative data resource providing radon test statistics for every Ohio county and ZIP code, published using data from the Ohio Department of Health Radon Education and Licensing Program. The site helps Ohio homeowners understand their radon risk and find licensed radon professionals.
+## What This Site Is
+Radon in Ohio publishes aggregate radon test statistics for 1,400+ Ohio ZIP codes and all 88 Ohio counties. Data is sourced from the Ohio Department of Health (ODH) Radon Education and Licensing Program. The site also maintains a directory of ODH-licensed radon testers and mitigation contractors.
 
-## Data
+## Data Coverage
+- 1,400+ Ohio ZIP codes with average radon levels, test counts, and maximum recorded values
+- 88 Ohio counties with aggregated radon statistics
+- Licensed radon testers and mitigation contractors organized by county
+- All measurements in picocuries per liter (pCi/L)
+- EPA action level: 4.0 pCi/L
+- Data reflects Ohio Department of Health test submissions through early 2021
 
-- [Ohio Radon Levels by County and ZIP](/state/ohio/) — statewide overview with county and ZIP rankings
-- [Find a Radon Contractor](/contractors/) — licensed radon mitigation professionals in Ohio
-- [Find a Radon Tester](/testers/) — licensed radon testing professionals in Ohio
+## Key Pages
+- Ohio statewide radon overview: https://radoninohio.com/state/ohio/
+- Browse all 88 counties: https://radoninohio.com/county/
+- Educational guide — What is Radon?: https://radoninohio.com/what-is-radon/
+- Data methodology and accuracy: https://radoninohio.com/data-accuracy/
+- About this site: https://radoninohio.com/about/
+- Find a mitigation contractor: https://radoninohio.com/contractors/
+- Find a radon tester: https://radoninohio.com/testers/
+
+## URL Patterns
+- County pages: https://radoninohio.com/county/{county-name}/
+- ZIP code pages: https://radoninohio.com/zip/{5-digit-zip}/
+- City pages: https://radoninohio.com/city/{city-name}/
+
+## Data Notes
+- This site does not conduct testing; all data is aggregated from ODH public records
+- ZIP codes with fewer than 10 tests are marked as low-confidence estimates
+- Maximum recorded values often represent extreme single-measurement outliers, not typical home levels
+- Individual home radon levels can vary significantly from ZIP code or county averages
+- The only way to know a specific home's radon level is to test it
 
 ## Key Facts
-
-- Radon is the second-leading cause of lung cancer in the United States (EPA)
-- The EPA action level is 4.0 pCi/L — testing is recommended for all homes
-- Ohio has one of the highest radon risk profiles in the US
-- Data source: Ohio Department of Health Radon Education and Licensing Program, 2020
+- Radon is the leading cause of lung cancer among non-smokers in the United States (EPA)
+- The EPA action level is 4.0 pCi/L — all homes should be tested
+- Most of Ohio falls in EPA Zone 1, the highest radon potential category
+- Ohio's elevated radon is due to uranium-rich shale, limestone, and glacial soils
+- Radon mitigation systems typically cost $1,200–$2,500 and reduce levels by 50–99%
 
 ## County Pages
-
 Each Ohio county page at /county/{county-name}/ includes:
-- Average radon level (pCi/L) across all tests in that county
-- Total test count, minimum, and maximum recorded values
-- EPA radon zone classification
-- List of ZIP codes with individual radon statistics
+- Direct answer: average radon level (pCi/L) across all county tests
+- Total test count, maximum recorded value, EPA risk classification
+- ZIP code breakdown table with individual radon statistics
 - Licensed radon contractors serving that county
 
 ## ZIP Code Pages
-
 Each Ohio ZIP code page at /zip/{zip}/ includes:
-- Average, minimum, and maximum radon levels from all recorded tests
-- Risk classification (high: ≥8 pCi/L, elevated: ≥4 pCi/L, low: <4 pCi/L)
-- Interactive map of the ZIP code boundary
+- Direct answer: average radon level for that ZIP code
+- Total test count, maximum recorded value, risk badge
+- Risk alert with EPA action threshold comparison
 - Nearby ZIP code comparison table
+- Licensed radon professionals serving that ZIP code
 
 ## About This Site
-
-Radon in Ohio is operated independently. Contractor listings are provided by the Ohio Department of Health and are updated periodically. Sponsored listings are clearly marked as advertisements.
+Radon in Ohio is an independent data resource. All contractor listings are verified against Ohio Department of Health licensing records. Sponsored featured listings are clearly marked.

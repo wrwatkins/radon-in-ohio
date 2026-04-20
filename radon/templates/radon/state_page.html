@@ -1,15 +1,32 @@
 {% extends "base.html" %}
 
 {% block title %}Ohio Radon Levels by County and ZIP Code — Statewide Radon Map{% endblock %}
-
 {% block og_title %}Ohio Radon Levels — County &amp; ZIP Code Map{% endblock %}
-{% block og_description %}Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. See which areas have the highest radon risk and find licensed radon professionals near you.{% endblock %}
+{% block og_description %}Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. Most of Ohio is EPA Zone 1 — the highest radon risk category. Find your local levels and licensed contractors.{% endblock %}
 
 {% block meta %}
-<meta name="description" content="Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. See which areas have the highest radon risk and find licensed radon professionals near you.">
+<meta name="description" content="Statewide radon data for all 88 Ohio counties and 1,400+ ZIP codes. Most of Ohio is EPA Zone 1 — the highest radon risk zone. See which areas have the highest radon risk and find licensed radon professionals near you.">
 {% endblock %}
 
+{% block leaflet_css %}{% if geo_counties %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">{% endif %}{% endblock %}
+
 {% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Ohio Radon Test Data — Statewide",
+  "description": "Aggregate indoor radon test statistics for Ohio ZIP codes and counties, sourced from the Ohio Department of Health Radon Education and Licensing Program.",
+  "url": "https://radoninohio.com/state/ohio/",
+  "publisher": { "@type": "Organization", "name": "Ohio Department of Health" },
+  "spatialCoverage": { "@type": "Place", "name": "Ohio, United States" },
+  "variableMeasured": [
+    { "@type": "PropertyValue", "name": "Mean Indoor Radon Level", "unitCode": "pCi/L" },
+    { "@type": "PropertyValue", "name": "Maximum Recorded Radon Level", "unitCode": "pCi/L" },
+    { "@type": "PropertyValue", "name": "Test Count" }
+  ]
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -23,51 +40,152 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-4">
-  <h1>Ohio Radon Levels — County &amp; ZIP Code Map</h1>
+<div class="container page-wrap">
+  <div class="row g-4">
+    <div class="col-lg-8">
 
-  <div id="map" style="height: 500px;" class="mb-3 rounded"></div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item active">Ohio Radon Levels</li>
+        </ol>
+      </nav>
 
-  <div class="row mt-4">
-    <div class="col-md-6">
-      <h2>Counties with Highest Radon Levels in Ohio</h2>
-      <table class="table table-bordered table-sm">
-        <thead class="table-dark">
-          <tr><th>County</th><th>Avg Radon</th><th>Tests</th></tr>
-        </thead>
-        <tbody>
-          {% for county in top_counties %}
-          <tr class="{% if county.radon_level.testmean >= 4 %}row-risk-high{% elif county.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
-            <td><a href="{{ county.get_absolute_url }}">{{ county.name }}</a></td>
-            <td><span class="{% if county.radon_level.testmean >= 4 %}risk-high{% elif county.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ county.radon_level.testmean }} pCi/L</span></td>
-            <td>{{ county.radon_level.testcount }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <h1 class="mb-3">Radon Levels in Ohio — By County &amp; ZIP Code</h1>
+
+      <p class="lead mb-4">Ohio is one of the highest-radon states in the country. The EPA classifies most of Ohio in
+      <strong>Zone 1</strong> — the highest radon potential category — where average indoor radon levels are predicted
+      to exceed the EPA action level of 4.0 pCi/L. Radon levels vary significantly by county and ZIP code based on
+      local geology, and the only way to know your home's actual level is to test it.</p>
+
+      <div class="radon-stat-card mb-4">
+        <div class="radon-stat-card-header">
+          <h2>Ohio Radon at a Glance</h2>
+          <span class="risk-badge risk-badge-high">Zone 1 State</span>
+        </div>
+        <div class="radon-stat-card-body">
+          <div class="row text-center g-0">
+            <div class="col-4">
+              <div class="section-label">EPA Zone</div>
+              <div class="stat-secondary risk-high">Zone 1</div>
+            </div>
+            <div class="col-4">
+              <div class="section-label">Counties Covered</div>
+              <div class="stat-secondary">88</div>
+            </div>
+            <div class="col-4">
+              <div class="section-label">ZIP Codes Covered</div>
+              <div class="stat-secondary">1,400+</div>
+            </div>
+          </div>
+          <div class="radon-alert radon-alert-high mt-3">
+            <i class="fas fa-exclamation-circle" style="margin-top:2px;flex-shrink:0;"></i>
+            <div><strong>Ohio's radon risk is among the highest in the US.</strong> The EPA recommends that all Ohio
+            homeowners test their homes regardless of county average — individual readings vary widely within the
+            same neighborhood.</div>
+          </div>
+          <p class="text-muted mt-2 mb-0" style="font-size:0.75rem;">Source: Ohio Department of Health Radon Education and Licensing Program &bull; Data reflects submissions through 2021</p>
+        </div>
+      </div>
+
+      {% if geo_counties %}
+      <h2 class="h5 mb-2">Ohio Radon Map</h2>
+      <div class="map-wrap mb-4">
+        <div id="map" style="height: 420px;"></div>
+      </div>
+      {% else %}
+      <div class="info-callout mb-4">
+        <i class="fas fa-map me-2" style="color:var(--steel);"></i>
+        Interactive county choropleth map coming soon. Browse county data using the tables below.
+      </div>
+      {% endif %}
+
+      <h2 class="h5 mb-3">Understanding Ohio Radon Risk</h2>
+      <p>Ohio's elevated radon levels are primarily the result of geology. The state sits atop uranium-rich shale,
+      limestone, and glacial soils that generate radon gas. As radon migrates upward through the soil, it enters
+      homes through foundation cracks, construction joints, and openings around service pipes. Homes with
+      basements are particularly susceptible, though slab-on-grade homes can also have elevated levels.</p>
+
+      <p>The EPA Zone system provides a county-level estimate of radon potential, but it does not predict the
+      radon level in any individual home. Within any Zone 1 county, some homes may test below 2 pCi/L while
+      neighboring homes test above 10 pCi/L. Testing your specific home is the only reliable method.</p>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <h2 class="h5 mb-3">Highest Radon Counties in Ohio</h2>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr><th>County</th><th>Avg Radon</th><th>Tests</th></tr>
+              </thead>
+              <tbody>
+                {% for county in top_counties %}
+                <tr class="{% if county.radon_level.testmean >= 4 %}row-risk-high{% elif county.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
+                  <td><a href="{{ county.get_absolute_url }}">{{ county.name }}</a></td>
+                  <td>
+                    <span class="risk-dot risk-dot-{% if county.radon_level.testmean >= 4 %}high{% elif county.radon_level.testmean >= 2 %}medium{% else %}low{% endif %}"></span>
+                    <strong class="{% if county.radon_level.testmean >= 4 %}risk-high{% elif county.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">{{ county.radon_level.testmean }} pCi/L</strong>
+                  </td>
+                  <td>{{ county.radon_level.testcount }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="text-muted mt-1 mb-0" style="font-size:0.75rem;">Counties with 5+ tests. <a href="/county/">Browse all 88 Ohio counties.</a></p>
+        </div>
+        <div class="col-md-6">
+          <h2 class="h5 mb-3">Highest Radon ZIP Codes in Ohio</h2>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr><th>ZIP Code</th><th>City</th><th>Avg Radon</th></tr>
+              </thead>
+              <tbody>
+                {% for zip in top_zips %}
+                <tr class="{% if zip.radon_level.testmean >= 4 %}row-risk-high{% elif zip.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
+                  <td><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
+                  <td>{{ zip.city }}</td>
+                  <td>
+                    <span class="risk-dot risk-dot-{% if zip.radon_level.testmean >= 4 %}high{% elif zip.radon_level.testmean >= 2 %}medium{% else %}low{% endif %}"></span>
+                    <strong class="{% if zip.radon_level.testmean >= 4 %}risk-high{% elif zip.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">{{ zip.radon_level.testmean }} pCi/L</strong>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {% include "partials/amazon_ad.html" %}
+
+      <h2 class="h5 mt-4 mb-3">What Should Ohio Homeowners Do?</h2>
+      <p>The EPA recommends that all homes be tested for radon, regardless of location.
+      If your home's radon level is at or above 4.0 pCi/L, the EPA recommends taking action.
+      Radon mitigation systems can reduce indoor radon levels by 50–99% at a typical installed cost of
+      $1,200–$2,500. Mitigation is cost-effective compared to the long-term health risk.</p>
+      <p>Ohio-licensed radon testers and mitigation contractors are trained and certified by the Ohio Department
+      of Health. Use our directory to find a professional near you.</p>
+
+      <div class="action-strip mb-4">
+        <div class="action-strip-text">
+          <strong>Search your ZIP code</strong> to see local radon levels and find licensed professionals.
+        </div>
+        <a href="/" class="btn-amber">Search My ZIP Code</a>
+      </div>
+
     </div>
-    <div class="col-md-6">
-      <h2>ZIP Codes with Highest Radon Levels in Ohio</h2>
-      <table class="table table-bordered table-sm">
-        <thead class="table-dark">
-          <tr><th>ZIP Code</th><th>City</th><th>Avg Radon</th></tr>
-        </thead>
-        <tbody>
-          {% for zip in top_zips %}
-          <tr class="{% if zip.radon_level.testmean >= 4 %}row-risk-high{% elif zip.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}">
-            <td><a href="{{ zip.get_absolute_url }}">{{ zip.zip }}</a></td>
-            <td>{{ zip.city }}</td>
-            <td><span class="{% if zip.radon_level.testmean >= 4 %}risk-high{% elif zip.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ zip.radon_level.testmean }} pCi/L</span></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="col-lg-4 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+{% if geo_counties %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   var map = L.map("map");
@@ -84,33 +202,20 @@ document.addEventListener("DOMContentLoaded", function() {
            radon > 2  ? "#5bc9e1" : "#00aaad";
   }
 
-  var countyData = [
-    {% for county in top_counties %}
-    {% if county.geometry %}
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "{{ county.name }}",
-        "mean": {{ county.radon_level.testmean }},
-        "count": {{ county.radon_level.testcount }},
-        "url": "{{ county.get_absolute_url }}"
-      },
-      "geometry": {{ county.geometry.geojson|safe }}
-    }{% if not forloop.last %},{% endif %}
-    {% endif %}
-    {% endfor %}
-  ];
+  var countyData = {{ geo_counties|safe }};
 
-  if (countyData.length) {
-    L.geoJSON({ "type": "FeatureCollection", "features": countyData }, {
+  if (countyData.features && countyData.features.length) {
+    var layer = L.geoJSON(countyData, {
       style: function(f) {
         return { color: "gray", weight: 1, fillOpacity: 0.7, fillColor: getColor(f.properties.mean) };
       },
-      onEachFeature: function(f, layer) {
-        layer.bindPopup("<strong><a href='" + f.properties.url + "'>" + f.properties.name + " County</a></strong><br>Avg: " + f.properties.mean + " pCi/L");
+      onEachFeature: function(f, l) {
+        l.bindPopup("<strong><a href='" + f.properties.url + "'>" + f.properties.name + " County</a></strong><br>Avg: " + f.properties.mean + " pCi/L<br>Tests: " + f.properties.count.toLocaleString());
       }
     }).addTo(map);
+    map.fitBounds(layer.getBounds(), { padding: [20, 20] });
   }
-}); // DOMContentLoaded
+});
 </script>
+{% endif %}
 {% endblock %}

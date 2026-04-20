@@ -1,38 +1,87 @@
 {% extends "base.html" %}
 
 {% block title %}Find a Licensed Radon Tester in Ohio — Home Testing Professionals{% endblock %}
-
 {% block og_title %}Find a Licensed Radon Tester in Ohio{% endblock %}
-{% block og_description %}Browse 670+ Ohio-licensed radon testing professionals. Get your home tested by a certified radon tester licensed by the Ohio Department of Health.{% endblock %}
-
+{% block og_description %}Browse Ohio-licensed radon testing professionals by county. Get your home tested by a certified radon tester licensed by the Ohio Department of Health.{% endblock %}
 {% block meta %}
 <meta name="description" content="Browse Ohio-licensed radon testing professionals by county. All listed testers are certified by the Ohio Department of Health Radon Education and Licensing Program.">
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-4">
-  <div class="row">
-    <div class="col-lg-9">
-      <h1>Licensed Radon Testers in Ohio</h1>
-      <p>These testers are licensed by the Ohio Department of Health to conduct radon testing in Ohio homes and buildings.</p>
+<div class="container page-wrap">
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item active">Radon Testers</li>
+        </ol>
+      </nav>
+
+      <h1 class="mb-1">Licensed Radon Testers in Ohio</h1>
+      <p class="mb-4">These professionals are licensed by the Ohio Department of Health to conduct radon testing
+      in Ohio homes and buildings. Filter by county to find a tester near you.</p>
+
+      {# County filter #}
+      <form method="get" class="d-flex gap-2 mb-4 align-items-end flex-wrap">
+        <div>
+          <label for="county-select" class="form-label mb-1" style="font-size:0.85rem;font-weight:600;">Filter by County</label>
+          <select id="county-select" name="county" class="form-select form-select-sm" style="min-width:200px;">
+            <option value="">All Counties</option>
+            {% for c in counties %}
+            <option value="{{ c.name }}" {% if county_filter == c.name %}selected{% endif %}>{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-sm btn-outline-secondary">Filter</button>
+        {% if county_filter %}<a href="/testers/" class="btn btn-sm btn-outline-secondary">Clear</a>{% endif %}
+      </form>
 
       {% if sponsors %}
-      <h2 class="mt-4">Featured Radon Testing Companies</h2>
+      <h2 class="h5 mb-3">Featured Radon Testing Companies</h2>
       {% for listing in sponsors %}
         {% include "partials/sponsor_card.html" with listing=listing %}
       {% endfor %}
       {% endif %}
 
-      <h2 class="mt-4">All Licensed Testers</h2>
+      <h2 class="h5 mb-3">
+        All Licensed Testers
+        {% if county_filter %}— {{ county_filter }} County{% endif %}
+        <small class="text-muted fw-normal" style="font-size:0.78rem;">({{ page_obj.paginator.count }} found)</small>
+      </h2>
       {% include "partials/contractor_list.html" with contractors=testers %}
 
-      <div class="mt-3">
-        <a href="{% url 'advertise' %}" class="btn btn-sm btn-outline-warning">
-          <i class="fas fa-star mr-1"></i>Are you a radon tester? Get featured here
+      {# Pagination #}
+      {% if page_obj.has_other_pages %}
+      <nav aria-label="Testers pagination" class="mt-4">
+        <ul class="pagination pagination-sm">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if county_filter %}county={{ county_filter }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+          </li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?{% if county_filter %}county={{ county_filter }}&{% endif %}page={{ num }}">{{ num }}</a>
+          </li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% if county_filter %}county={{ county_filter }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+
+      <div class="mt-4">
+        <a href="{% url 'advertise' %}" class="btn-outline" style="font-size:0.82rem;">
+          <i class="fas fa-star me-1" style="color:var(--amber);"></i>Are you a radon tester? Get featured here
         </a>
       </div>
     </div>
-    <div class="col-lg-3 d-none d-lg-block">
+    <div class="col-lg-4 d-none d-lg-block">
       {% include "partials/sidebar_resources.html" %}
     </div>
   </div>

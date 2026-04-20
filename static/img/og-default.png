@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#1a2744"/>
+  <rect y="0" width="1200" height="8" fill="#e8a020"/>
+  <text x="600" y="240" font-family="system-ui,sans-serif" font-size="72" font-weight="700" fill="white" text-anchor="middle">Radon in Ohio</text>
+  <text x="600" y="320" font-family="system-ui,sans-serif" font-size="32" fill="rgba(255,255,255,0.75)" text-anchor="middle">Radon levels for every Ohio ZIP code and county</text>
+  <text x="600" y="390" font-family="system-ui,sans-serif" font-size="24" fill="#e8a020" text-anchor="middle">Data sourced from the Ohio Department of Health</text>
+  <rect x="460" y="450" width="280" height="56" rx="6" fill="#e8a020"/>
+  <text x="600" y="487" font-family="system-ui,sans-serif" font-size="22" font-weight="700" fill="#1a2744" text-anchor="middle">radoninohio.com</text>
+</svg>

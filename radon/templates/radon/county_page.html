@@ -1,29 +1,27 @@
 {% extends "base.html" %}
+{% load humanize %}
 
-{% block title %}Radon Levels in {{ county.name }} County, Ohio — By ZIP Code{% endblock %}
-
+{% block title %}Radon Levels in {{ county.name }} County, Ohio{% endblock %}
 {% block og_title %}Radon Levels in {{ county.name }} County, Ohio{% endblock %}
-{% block og_description %}{% if radon %}Average radon in {{ county.name }} County, OH: {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests.{% else %}Radon test data for {{ county.name }} County, Ohio.{% endif %} View all ZIP codes and find licensed radon contractors.{% endblock %}
-
+{% block og_description %}{% if radon %}Average radon in {{ county.name }} County, OH: {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests.{% else %}Radon test data for {{ county.name }} County, Ohio.{% endif %} View all ZIP codes and find licensed contractors.{% endblock %}
 {% block meta %}
-<meta name="description" content="{% if radon %}Average radon in {{ county.name }} County, OH: {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests.{% else %}Radon test data for {{ county.name }} County, Ohio.{% endif %} View all ZIP codes and find licensed radon contractors.">
+<meta name="description" content="{% if radon %}Average radon in {{ county.name }} County, OH: {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests.{% else %}Radon test data for {{ county.name }} County, Ohio.{% endif %} View all ZIP codes and find licensed contractors.">
 {% endblock %}
+
+{% block leaflet_css %}{% if geo_data %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">{% endif %}{% endblock %}
 
 {% block schema %}
 {% if radon %}
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "Dataset",
+  "@context": "https://schema.org", "@type": "Dataset",
   "name": "Radon Test Data — {{ county.name }} County, Ohio",
-  "description": "County-level radon test statistics for {{ county.name }} County, OH. Average: {{ radon.testmean }} pCi/L across {{ radon.testcount }} tests.",
+  "description": "Average indoor radon level in {{ county.name }} County, Ohio is {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests from the Ohio Department of Health.",
   "url": "https://radoninohio.com{{ county.get_absolute_url }}",
+  "datePublished": "{{ radon.pubdate|date:'Y-m-d' }}",
+  "dateModified": "{{ radon.pubdate|date:'Y-m-d' }}",
   "publisher": { "@type": "Organization", "name": "{{ radon.publisher }}" },
-  "spatialCoverage": {
-    "@type": "Place",
-    "name": "{{ county.name }} County, Ohio",
-    "address": { "@type": "PostalAddress", "addressRegion": "OH", "addressCountry": "US" }
-  },
+  "spatialCoverage": { "@type": "Place", "name": "{{ county.name }} County, Ohio" },
   "variableMeasured": [
     { "@type": "PropertyValue", "name": "Mean Radon Level", "value": "{{ radon.testmean }}", "unitCode": "pCi/L" },
     { "@type": "PropertyValue", "name": "Maximum Radon Level", "value": "{{ radon.testmax }}", "unitCode": "pCi/L" },
@@ -31,11 +29,34 @@
   ]
 }
 </script>
-{% endif %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the radon level in {{ county.name }} County, Ohio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The average indoor radon level in {{ county.name }} County, Ohio is {{ radon.testmean }} pCi/L based on {{ radon.testcount }} tests from the Ohio Department of Health{% if radon.testmean >= 4 %}, which exceeds the EPA action level of 4.0 pCi/L{% endif %}."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is radon high in {{ county.name }} County?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "{% if radon.testmean >= 4 %}Yes. {{ county.name }} County has an average radon level of {{ radon.testmean }} pCi/L, above the EPA action level of 4.0 pCi/L. The EPA recommends testing all homes in this county.{% elif radon.testmean >= 2 %}Radon levels in {{ county.name }} County are elevated at {{ radon.testmean }} pCi/L on average. The EPA recommends considering mitigation at levels above 2.0 pCi/L.{% else %}The average radon level in {{ county.name }} County is {{ radon.testmean }} pCi/L, below the EPA action level of 4.0 pCi/L. Individual homes may still vary — testing is recommended.{% endif %}"
+      }
+    }
+  ]
+}
+</script>
+{% endif %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org", "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://radoninohio.com/" },
     { "@type": "ListItem", "position": 2, "name": "Ohio", "item": "https://radoninohio.com/state/ohio/" },
@@ -46,9 +67,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-4">
-  <div class="row">
-    <div class="col-lg-9">
+<div class="container page-wrap">
+  <div class="row g-4">
+    <div class="col-lg-8">
 
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -58,99 +79,149 @@
         </ol>
       </nav>
 
-      <h1>Radon Levels in {{ county.name }} County, Ohio</h1>
+      <h1 class="mb-1">Radon in {{ county.name }} County, Ohio</h1>
 
       {% if radon %}
-      <div class="card mb-4 border-{% if radon.testmean >= 4 %}danger{% elif radon.testmean >= 2 %}warning{% else %}success{% endif %}">
-        <div class="card-body">
-          <div class="row text-center">
-            <div class="col-md-3 border-end">
-              <p class="stat-label">County Average</p>
-              <p class="stat-radon {% if radon.testmean >= 4 %}risk-high{% elif radon.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} mb-0">{{ radon.testmean }}<small> pCi/L</small></p>
+      {# Direct-answer prose paragraph for search engines and AI #}
+      <p class="mb-4">The average indoor radon level in {{ county.name }} County, Ohio is
+      <strong>{{ radon.testmean }} pCi/L</strong> based on {{ radon.testcount|intcomma }} test{% if radon.testcount != 1 %}s{% endif %}
+      from the Ohio Department of Health{% if radon.testmean >= 4 %},
+      exceeding the EPA action level of 4.0 pCi/L — residents are encouraged to test their homes and consider mitigation{% elif radon.testmean >= 2 %},
+      which is elevated above the EPA's recommended consideration threshold of 2.0 pCi/L{% else %},
+      which is below the EPA action level of 4.0 pCi/L{% endif %}.
+      Individual home readings vary — testing your specific home is the only way to know your actual exposure.</p>
+
+      <div class="radon-stat-card mb-4">
+        <div class="radon-stat-card-header">
+          <h2>County Radon Summary</h2>
+          <span class="risk-badge risk-badge-{% if radon.testmean >= 4 %}high{% elif radon.testmean >= 2 %}medium{% else %}low{% endif %}">
+            {% if radon.testmean >= 4 %}Action Recommended{% elif radon.testmean >= 2 %}Elevated{% else %}Below Threshold{% endif %}
+          </span>
+        </div>
+        <div class="radon-stat-card-body">
+          <div class="row align-items-center g-3">
+            <div class="col-sm-auto text-center text-sm-start">
+              <div class="section-label">County Average</div>
+              <div class="stat-radon {% if radon.testmean >= 4 %}risk-high{% elif radon.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">
+                {{ radon.testmean }}<small> pCi/L</small>
+              </div>
             </div>
-            <div class="col-md-3 border-end">
-              <p class="stat-label">Total Tests</p>
-              <p class="stat-secondary mb-0">{{ radon.testcount }}</p>
-            </div>
-            <div class="col-md-3 border-end">
-              <p class="stat-label">Maximum</p>
-              <p class="stat-secondary mb-0">{{ radon.testmax }}<small> pCi/L</small></p>
-            </div>
-            <div class="col-md-3">
-              <p class="stat-label">EPA Action Level</p>
-              <p class="stat-secondary {% if radon.testmean >= 4 %}risk-high{% else %}risk-low{% endif %} mb-0">4.0<small> pCi/L</small></p>
+            <div class="col-sm">
+              <div class="radon-gauge">
+                <div class="radon-gauge-label">
+                  <span>0 pCi/L</span>
+                  <span style="color:var(--navy);font-weight:700;">County avg: {{ radon.testmean }}</span>
+                  <span>12+ pCi/L</span>
+                </div>
+                <div class="radon-gauge-track">
+                  <div class="radon-gauge-fill" id="gaugeFill"></div>
+                  <div class="radon-gauge-epa"></div>
+                  <div class="radon-gauge-marker" id="gaugeMarker"></div>
+                </div>
+                <div class="radon-gauge-scale">
+                  <span>Safe</span><span>Elevated</span><span>Action Required</span>
+                </div>
+              </div>
             </div>
           </div>
-          <p class="text-muted small mt-2 mb-0">Source: {{ radon.publisher }} — {{ radon.pubdate }}</p>
+          <hr class="stat-divider my-3">
+          <div class="row text-center g-0">
+            <div class="col-4">
+              <div class="section-label">Total Tests</div>
+              <div class="stat-secondary">{{ radon.testcount }}</div>
+            </div>
+            <div class="col-4">
+              <div class="section-label">Maximum Recorded</div>
+              <div class="stat-secondary">{{ radon.testmax }}<small> pCi/L</small></div>
+            </div>
+            <div class="col-4">
+              <div class="section-label">EPA Action Level</div>
+              <div class="stat-secondary {% if radon.testmean >= 4 %}risk-high{% else %}risk-low{% endif %}">4.0<small> pCi/L</small></div>
+            </div>
+          </div>
+          {% if radon.testmax >= 50 %}
+          <p class="text-muted mt-2 mb-0" style="font-size:0.75rem;"><i class="fas fa-info-circle me-1"></i>The maximum recorded value reflects an extreme single-measurement outlier and is not representative of typical homes in this county.</p>
+          {% endif %}
+          <p class="text-muted mt-2 mb-0" style="font-size:0.75rem;">Source: {{ radon.publisher }} &bull; Data through {% if radon.pubdate %}{{ radon.pubdate|date:"F Y" }}{% else %}2021{% endif %}</p>
         </div>
+      </div>
+
+      <div class="action-strip mb-4">
+        <div class="action-strip-text">
+          <strong>Need to test or mitigate?</strong> Find licensed Ohio radon professionals serving {{ county.name }} County.
+        </div>
+        <a href="/contractors/?county={{ county.name }}" class="btn-amber">Find a Contractor</a>
+      </div>
+
+      {% else %}
+      <div class="info-callout mb-4">
+        <i class="fas fa-info-circle me-2" style="color:var(--steel);"></i>
+        No radon test data is currently available for {{ county.name }} County. <a href="/what-is-radon/">Learn about radon testing.</a>
       </div>
       {% endif %}
 
       {% if geo_data %}
-      <div id="map" style="height: 400px;" class="mb-3 rounded"></div>
+      <div class="map-wrap mb-4">
+        <div id="map" style="height: 340px;"></div>
+      </div>
+      {% endif %}
+
+      {% if zip_codes %}
+      <h2 class="h5 mt-4 mb-3">Radon by ZIP Code — {{ county.name }} County</h2>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr><th>ZIP</th><th>City</th><th>Avg Radon</th><th>Tests</th><th>Max</th></tr>
+          </thead>
+          <tbody>
+            {% for z in zip_codes %}
+            <tr class="{% if z.radon_level %}{% if z.radon_level.testmean >= 4 %}row-risk-high{% elif z.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}{% endif %}">
+              <td><a href="{{ z.get_absolute_url }}">{{ z.zip }}</a></td>
+              <td>{{ z.city }}</td>
+              <td>{% if z.radon_level %}
+                <span class="risk-dot risk-dot-{% if z.radon_level.testmean >= 4 %}high{% elif z.radon_level.testmean >= 2 %}medium{% else %}low{% endif %}"></span>
+                <strong class="{% if z.radon_level.testmean >= 4 %}risk-high{% elif z.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">{{ z.radon_level.testmean }} pCi/L</strong>
+              {% else %}—{% endif %}</td>
+              <td>{% if z.radon_level %}{{ z.radon_level.testcount }}{% else %}—{% endif %}</td>
+              <td>{% if z.radon_level %}{{ z.radon_level.testmax }}{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      {% if cities %}
+      <h2 class="h5 mt-4 mb-2">Cities in {{ county.name }} County</h2>
+      <div class="d-flex flex-wrap gap-2 mb-4">
+        {% for city in cities %}
+        <a href="{{ city.get_absolute_url }}" class="btn-outline" style="font-size:0.8rem;padding:0.3rem 0.8rem;">{{ city.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if sponsors %}
+      <h2 class="h5 mt-4 mb-3">Featured Radon Professionals — {{ county.name }} County</h2>
+      {% for listing in sponsors %}{% include "partials/sponsor_card.html" with listing=listing %}{% endfor %}
+      {% endif %}
+
+      {% if contractors %}
+      <h2 class="h5 mt-4 mb-2">Licensed Radon Contractors — {{ county.name }} County</h2>
+      <p class="text-muted mb-2" style="font-size:0.82rem;">All contractors are licensed by the Ohio Department of Health.
+        <strong>Tester</strong> = can perform home tests. <strong>Mitigator</strong> = can install mitigation systems.</p>
+      {% include "partials/contractor_list.html" with contractors=contractors %}
       {% endif %}
 
       {% include "partials/amazon_ad.html" %}
 
-      {% if zip_codes %}
-      <h2 class="mt-4">Radon by ZIP Code in {{ county.name }} County</h2>
-      <table class="table table-bordered table-sm">
-        <thead class="table-dark">
-          <tr><th>ZIP Code</th><th>City</th><th>Avg Radon</th><th>Tests</th><th>Max</th></tr>
-        </thead>
-        <tbody>
-          {% for z in zip_codes %}
-          {% if z.radon_level %}
-            {% if z.radon_level.testmean >= 4 %}
-            <tr class="row-risk-high">
-            {% elif z.radon_level.testmean >= 2 %}
-            <tr class="row-risk-medium">
-            {% else %}
-            <tr class="row-risk-low">
-            {% endif %}
-          {% else %}
-          <tr>
-          {% endif %}
-            <td><a href="{{ z.get_absolute_url }}">{{ z.zip }}</a></td>
-            <td>{{ z.city }}</td>
-            <td>{% if z.radon_level %}<span class="{% if z.radon_level.testmean >= 4 %}risk-high{% elif z.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %} fw-bold">{{ z.radon_level.testmean }} pCi/L</span>{% else %}—{% endif %}</td>
-            <td>{% if z.radon_level %}{{ z.radon_level.testcount }}{% else %}—{% endif %}</td>
-            <td>{% if z.radon_level %}{{ z.radon_level.testmax }} pCi/L{% else %}—{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% endif %}
-
-      {% if cities %}
-      <h2 class="mt-4">Cities in {{ county.name }} County</h2>
-      <ul class="list-inline">
-        {% for city in cities %}
-        <li class="list-inline-item me-3 mb-2"><a href="{{ city.get_absolute_url }}">{{ city.name }}</a></li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      {% if sponsors %}
-      <h2 class="mt-4">Featured Radon Professionals in {{ county.name }} County</h2>
-      {% for listing in sponsors %}
-        {% include "partials/sponsor_card.html" with listing=listing %}
-      {% endfor %}
-      {% endif %}
-
-      {% if contractors %}
-      <h2 class="mt-4">Licensed Radon Contractors in {{ county.name }} County</h2>
-      {% include "partials/contractor_list.html" with contractors=contractors %}
-      {% endif %}
-
-      <div class="mt-3">
-        <a href="{% url 'advertise' %}" class="btn btn-sm btn-contractor-cta">
-          <i class="fas fa-star me-1"></i>Are you a contractor? Get featured here
+      <div class="mt-4">
+        <a href="{% url 'advertise' %}" class="btn-outline" style="font-size:0.82rem;">
+          <i class="fas fa-star me-1" style="color:var(--amber);"></i>Are you a contractor? Get featured here
         </a>
       </div>
 
     </div>
-    <div class="col-lg-3 d-none d-lg-block">
+    <div class="col-lg-4 d-none d-lg-block">
       {% include "partials/sidebar_resources.html" %}
     </div>
   </div>
@@ -159,17 +230,26 @@
 
 {% block extra_js %}
 {% if geo_data %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+{% endif %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+  {% if radon %}
+  var level = parseFloat("{{ radon.testmean }}");
+  var pct = Math.min(level / 12 * 100, 98);
+  document.getElementById("gaugeFill").style.width = pct + "%";
+  document.getElementById("gaugeMarker").style.left = pct + "%";
+  {% endif %}
+  {% if geo_data %}
   var map = L.map("map");
   L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
     attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors &copy; <a href='https://carto.com/attributions'>CARTO</a>"
   }).addTo(map);
   var geojson = L.geoJSON({{ geo_data|safe }}, {
-    style: { color: "#e81e25", weight: 2, fillOpacity: 0.2 }
+    style: { color: "#1a2744", weight: 2, fillColor: "#2e5090", fillOpacity: 0.12 }
   }).addTo(map);
   map.fitBounds(geojson.getBounds(), { padding: [20, 20] });
+  {% endif %}
 });
 </script>
-{% endif %}
 {% endblock %}

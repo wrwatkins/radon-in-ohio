@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Radon Levels by County — All 88 Ohio Counties{% endblock %}
+{% block og_title %}Ohio Radon Levels by County{% endblock %}
+{% block og_description %}Radon test data for all 88 Ohio counties. Find your county's average radon level, view ZIP code data, and find licensed contractors near you.{% endblock %}
+{% block meta %}
+<meta name="description" content="Radon test data for all 88 Ohio counties sourced from the Ohio Department of Health. Find average radon levels and licensed contractors by county.">
+{% endblock %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://radoninohio.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Ohio", "item": "https://radoninohio.com/state/ohio/" },
+    { "@type": "ListItem", "position": 3, "name": "Browse by County", "item": "https://radoninohio.com/county/" }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container page-wrap">
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/state/ohio/">Ohio</a></li>
+          <li class="breadcrumb-item active">Browse by County</li>
+        </ol>
+      </nav>
+
+      <h1 class="mb-3">Ohio Radon Levels by County</h1>
+      <p class="mb-4">Radon test data for all 88 Ohio counties, sourced from the Ohio Department of Health.
+      Select a county to see ZIP code breakdowns, average radon levels, and licensed contractors near you.</p>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr><th>County</th><th>Avg Radon</th><th>Total Tests</th><th>Risk Level</th></tr>
+          </thead>
+          <tbody>
+            {% for county in counties %}
+            <tr class="{% if county.radon_level %}{% if county.radon_level.testmean >= 4 %}row-risk-high{% elif county.radon_level.testmean >= 2 %}row-risk-medium{% else %}row-risk-low{% endif %}{% endif %}">
+              <td><a href="{{ county.get_absolute_url }}">{{ county.name }}</a></td>
+              <td>
+                {% if county.radon_level %}
+                <span class="risk-dot risk-dot-{% if county.radon_level.testmean >= 4 %}high{% elif county.radon_level.testmean >= 2 %}medium{% else %}low{% endif %}"></span>
+                <strong class="{% if county.radon_level.testmean >= 4 %}risk-high{% elif county.radon_level.testmean >= 2 %}risk-medium{% else %}risk-low{% endif %}">{{ county.radon_level.testmean }} pCi/L</strong>
+                {% else %}—{% endif %}
+              </td>
+              <td>{% if county.radon_level %}{{ county.radon_level.testcount }}{% else %}—{% endif %}</td>
+              <td>
+                {% if county.radon_level %}
+                <span class="risk-badge risk-badge-{% if county.radon_level.testmean >= 4 %}high{% elif county.radon_level.testmean >= 2 %}medium{% else %}low{% endif %}" style="font-size:0.7rem;">
+                  {% if county.radon_level.testmean >= 4 %}Action Recommended{% elif county.radon_level.testmean >= 2 %}Elevated{% else %}Below Threshold{% endif %}
+                </span>
+                {% else %}No data{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-muted mt-3" style="font-size:0.8rem;">Source: Ohio Department of Health Radon Education and Licensing Program. Data reflects test submissions through 2021.</p>
+
+    </div>
+    <div class="col-lg-4 d-none d-lg-block">
+      {% include "partials/sidebar_resources.html" %}
+    </div>
+  </div>
+</div>
+{% endblock %}
