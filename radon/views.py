@@ -47,7 +47,7 @@ def zip_view(request, zip_code):
 
     geo_data = None
     if zip_obj.geometry:
-        geo_data = json.dumps(zip_obj.geometry.geojson)
+        geo_data = zip_obj.geometry.geojson  # already a JSON string
 
     return render(request, "radon/zip_page.html", {
         "zip": zip_obj,
@@ -75,7 +75,7 @@ def county_view(request, county_name):
 
     geo_data = None
     if county.geometry:
-        geo_data = json.dumps(county.geometry.geojson)
+        geo_data = county.geometry.geojson  # already a JSON string
 
     return render(request, "radon/county_page.html", {
         "county": county,
