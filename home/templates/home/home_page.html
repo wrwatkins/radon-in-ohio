@@ -12,7 +12,7 @@
 
 {% block content %}
 <div class="jumbotron-fluid w3-flat-asbestos text-center" id="main-jumbotron"
-     style="background-image: url('{% static 'images/backgrounds/' %}{{ bg_photo }}');">
+     style="background-image: url('{% static 'images/backgrounds/' %}{{ bg_photo }}'); background-size: cover; background-position: center center; background-attachment: fixed;">
   <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
     <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
     <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
