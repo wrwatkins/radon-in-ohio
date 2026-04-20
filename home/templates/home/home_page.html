@@ -16,10 +16,11 @@
   <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
     <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
     <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
-    <form id="main-query-zip-form" class="mt-5 mx-auto">
-      <input class="form-control input-lg" type="search" id="main-query-zip"
-             placeholder="OH ZIP Code" aria-label="Search by ZIP code">
-      <button class="btn btn-primary btn-lg" id="main-query-zip-submit" type="submit">Search</button>
+    <form id="main-query-zip-form" class="mt-5 mx-auto d-flex gap-2" style="max-width:320px;">
+      <input class="form-control" type="search" id="main-query-zip"
+             placeholder="OH ZIP Code" aria-label="Search by ZIP code"
+             maxlength="5" inputmode="numeric" style="max-width:130px;">
+      <button class="btn btn-primary" id="main-query-zip-submit" type="submit">Search</button>
     </form>
     <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none"></small>
     <p class="text-white mt-4 small">{{ bg_caption }}</p>
