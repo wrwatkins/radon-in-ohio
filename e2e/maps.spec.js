@@ -104,30 +104,27 @@ test.describe('County page data', () => {
   });
 });
 
-// ── State page map ──────────────────────────────────────────────────────────
-// County geometry not yet imported so choropleth is empty; map + tiles still tested.
-test.describe('State page map', () => {
+// ── State page — county geometry not yet imported, map replaced by callout ───
+test.describe('State page', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/state/ohio/');
   });
 
-  test('map container renders', async ({ page }) => {
-    await expect(page.locator('#map')).toBeVisible();
-  });
-
-  test('Leaflet tiles load', async ({ page }) => {
-    await waitForTiles(page);
-  });
-
+  // #map only renders when county geometry is imported; until then a callout is shown
   test('county table has risk-encoded rows', async ({ page }) => {
     const count = await page.locator('tr.row-risk-high, tr.row-risk-medium, tr.row-risk-low').count();
     expect(count).toBeGreaterThan(0);
   });
+
+  test('page heading is visible', async ({ page }) => {
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
 });
 
-// ── Regression: Leaflet L defined on all map pages ──────────────────────────
-test('Leaflet global L is defined on all map pages', async ({ page }) => {
-  for (const url of ['/', '/zip/43016/', '/county/franklin/', '/state/ohio/']) {
+// ── Regression: Leaflet L defined on pages that have map data ───────────────
+// County and state pages only load Leaflet when geometry is in the DB.
+test('Leaflet global L is defined on map pages with geometry', async ({ page }) => {
+  for (const url of ['/', '/zip/43016/']) {
     await page.goto(url);
     const leafletDefined = await page.evaluate(() => typeof window.L !== 'undefined');
     expect(leafletDefined, `L not defined on ${url}`).toBe(true);
