@@ -56,7 +56,7 @@ a:hover { color: var(--navy); }
 
 /* ── Navigation ────────────────────────────────────────────────────────────── */
 .site-nav {
-  background: var(--white) !important;
+  background: var(--navy) !important;
   border-bottom: 3px solid var(--amber);
   box-shadow: var(--shadow-sm);
   padding: 0;
@@ -69,7 +69,7 @@ a:hover { color: var(--navy); }
 #main-logo { height: 44px; }
 
 .site-nav .nav-link {
-  color: var(--navy) !important;
+  color: var(--white) !important;
   font-weight: 500;
   font-size: 0.9rem;
   padding: 1rem 0.9rem !important;
@@ -79,8 +79,8 @@ a:hover { color: var(--navy); }
 }
 
 .site-nav .nav-link:hover {
-  color: var(--steel) !important;
-  border-bottom-color: var(--steel);
+  color: var(--amber) !important;
+  border-bottom-color: var(--amber);
 }
 
 .site-nav .dropdown-menu {
