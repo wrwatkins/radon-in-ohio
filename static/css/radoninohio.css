@@ -56,7 +56,7 @@ a:hover { color: var(--navy); }
 
 /* ── Navigation ────────────────────────────────────────────────────────────── */
 .site-nav {
-  background: var(--white);
+  background: var(--white) !important;
   border-bottom: 3px solid var(--amber);
   box-shadow: var(--shadow-sm);
   padding: 0;
@@ -104,10 +104,10 @@ a:hover { color: var(--navy); }
 .btn-nav-cta {
   background: var(--amber);
   color: var(--navy) !important;
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 600;
+  font-size: 0.8rem;
   border-radius: var(--radius);
-  padding: 0.45rem 1.1rem !important;
+  padding: 0.3rem 0.85rem !important;
   border: none;
   border-bottom: none !important;
   margin-left: 0.5rem;
