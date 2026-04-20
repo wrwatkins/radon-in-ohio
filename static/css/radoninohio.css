@@ -38,11 +38,11 @@ body {
   font-size: 16px;
   line-height: 1.6;
   color: var(--slate-800);
-  background: var(--slate-50);
+  background: var(--slate-100);
   -webkit-font-smoothing: antialiased;
 }
 
-main { background: var(--white); }
+main { background: var(--white); box-shadow: var(--shadow-md); }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font);
@@ -567,7 +567,7 @@ a:hover { color: var(--navy); }
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-200);
   transition: background 0.1s;
 }
 
@@ -614,7 +614,7 @@ tr.row-risk-low    { border-left: 3px solid var(--risk-low); }
 
 /* ── Featured Pro card ─────────────────────────────────────────────────────── */
 .pro-card {
-  border: 1px solid var(--slate-100);
+  border: 1px solid var(--slate-200);
   border-left: 4px solid var(--amber);
   border-radius: var(--radius);
   padding: 1.1rem 1.25rem;
@@ -680,7 +680,7 @@ tr.row-risk-low    { border-left: 3px solid var(--risk-low); }
 /* ── Sidebar ───────────────────────────────────────────────────────────────── */
 .sidebar-card {
   background: var(--white);
-  border: 1px solid var(--slate-100);
+  border: 1px solid var(--slate-200);
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -701,7 +701,7 @@ tr.row-risk-low    { border-left: 3px solid var(--risk-low); }
 
 .sidebar-link-list { list-style: none; padding: 0; margin: 0; }
 
-.sidebar-link-list li { border-bottom: 1px solid var(--slate-100); }
+.sidebar-link-list li { border-bottom: 1px solid var(--slate-200); }
 .sidebar-link-list li:last-child { border-bottom: none; }
 
 .sidebar-link-list a {
@@ -718,7 +718,7 @@ tr.row-risk-low    { border-left: 3px solid var(--risk-low); }
 /* ── Info callout ──────────────────────────────────────────────────────────── */
 .info-callout {
   background: var(--slate-50);
-  border: 1px solid var(--slate-100);
+  border: 1px solid var(--slate-200);
   border-radius: var(--radius);
   padding: 1rem 1.1rem;
   font-size: 0.85rem;
@@ -731,7 +731,7 @@ tr.row-risk-low    { border-left: 3px solid var(--risk-low); }
 /* ── EPA context bar ───────────────────────────────────────────────────────── */
 .epa-context {
   background: var(--slate-50);
-  border: 1px solid var(--slate-100);
+  border: 1px solid var(--slate-200);
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
   font-size: 0.8rem;
