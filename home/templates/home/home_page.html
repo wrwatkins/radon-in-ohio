@@ -13,17 +13,17 @@
 {% block content %}
 <div class="jumbotron-fluid w3-flat-asbestos text-center" id="main-jumbotron"
      style="background-image: url('{% static 'images/backgrounds/' %}{{ bg_photo }}'); background-size: cover; background-position: center center; background-attachment: fixed;">
-  <div id="main-search" class="justify-content-center container-fluid h-100 w-100 p-5 main-search">
-    <h1 class="name pt-5"><span class="deep-shadowed text-white">Radon in Ohio</span></h1>
-    <h5><span class="deep-shadowed text-white">{{ page.hero_tagline }}</span></h5>
-    <form id="main-query-zip-form" class="mt-5 mx-auto d-flex gap-2" style="max-width:320px;">
-      <input class="form-control" type="search" id="main-query-zip"
-             placeholder="OH ZIP Code" aria-label="Search by ZIP code"
-             maxlength="5" inputmode="numeric" style="max-width:130px;">
-      <button class="btn btn-primary" id="main-query-zip-submit" type="submit" style="border:2px solid rgba(255,255,255,0.7);">Search</button>
+  <div id="main-search" style="width:100%;padding:5rem 1rem 3rem;display:flex;flex-direction:column;align-items:center;text-align:center;">
+    <h1 style="font-size:clamp(2.2rem,5vw,3.5rem);font-weight:700;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.9);margin-bottom:0.5rem;">Radon in Ohio</h1>
+    <p style="font-size:clamp(1rem,2.5vw,1.35rem);color:rgba(255,255,255,0.92);text-shadow:0 1px 6px rgba(0,0,0,0.8);margin-bottom:2.5rem;max-width:500px;">{{ page.hero_tagline }}</p>
+    <form id="main-query-zip-form" class="d-flex gap-2" style="max-width:340px;width:100%;">
+      <input class="form-control form-control-lg" type="search" id="main-query-zip"
+             placeholder="Enter ZIP code" aria-label="Search by ZIP code"
+             maxlength="5" inputmode="numeric" style="font-size:1.1rem;letter-spacing:0.05em;">
+      <button class="btn btn-primary btn-lg" id="main-query-zip-submit" type="submit" style="border:2px solid rgba(255,255,255,0.7);white-space:nowrap;">Search</button>
     </form>
-    <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none"></small>
-    <p class="text-white mt-4 small">{{ bg_caption }}</p>
+    <small id="main-query-message" class="form-text p-2 bg-danger text-white rounded d-none mt-2"></small>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.75rem;margin-top:1.5rem;">{{ bg_caption }}</p>
   </div>
 </div>
 
