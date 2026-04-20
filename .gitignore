@@ -43,3 +43,6 @@ ENV/
 
 # Docker
 *.override.yml
+node_modules/
+test-results/
+playwright-report/
