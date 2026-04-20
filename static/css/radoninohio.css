@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;600;700&family=Montserrat:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&family=Montserrat:wght@300;400;500&display=swap");
 
 /* ── Design System ─────────────────────────────────────────────────────────── */
 :root {
@@ -10,7 +10,7 @@
   --color-risk-high:   #c0392b;
   --color-accent:      #f39c12;
   --color-bg:          #f8f9fa;
-  --font-heading:      'Josefin Sans', sans-serif;
+  --font-heading:      'IBM Plex Sans', sans-serif;
   --font-body:         'Montserrat', sans-serif;
 }
 
@@ -92,7 +92,7 @@ tr.row-risk-low    { border-left: 4px solid var(--color-risk-low); }
 
 /* ── Radon stat display ────────────────────────────────────────────────────── */
 .stat-radon {
-  font-family: var(--font-heading);
+  font-family: 'IBM Plex Sans Condensed', sans-serif;
   font-size: 3.5rem;
   font-weight: 700;
   line-height: 1;
