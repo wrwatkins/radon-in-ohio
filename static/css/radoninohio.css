@@ -105,9 +105,9 @@ a:hover { color: var(--navy); }
   background: var(--amber);
   color: var(--navy) !important;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   border-radius: var(--radius);
-  padding: 0.3rem 0.85rem !important;
+  padding: 0.41rem 0.82rem !important;
   border: none;
   border-bottom: none !important;
   margin-left: 0.5rem;
