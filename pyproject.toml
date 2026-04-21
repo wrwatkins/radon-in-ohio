@@ -1,0 +1,17 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "radoninohio.settings.test"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--cov=home --cov=radon --cov-report=term-missing --cov-report=html"
+
+[tool.coverage.run]
+source = ["home", "radon"]
+omit = ["*/migrations/*", "*/tests/*", "*/tests.py"]
+
+[tool.coverage.report]
+skip_covered = false
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

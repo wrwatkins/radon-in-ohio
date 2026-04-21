@@ -49,3 +49,8 @@ playwright-report/
 
 # Claude Code (user-level config; skills live in ~/.claude/)
 .claude/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
