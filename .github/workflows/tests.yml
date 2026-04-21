@@ -22,8 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install system deps (GDAL)
+      - name: Install system deps (GDAL 3.12+ from ubuntugis)
         run: |
+          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
           sudo apt-get update
           sudo apt-get install -y gdal-bin libgdal-dev
 

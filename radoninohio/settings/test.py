@@ -1,4 +1,11 @@
 import os
+import sys
+
+if not any("pytest" in arg for arg in sys.argv):
+    raise RuntimeError(
+        "radoninohio.settings.test is only intended for pytest. "
+        "Never use it as the runtime DJANGO_SETTINGS_MODULE."
+    )
 
 os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-production")  # nosec B105
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
@@ -10,6 +17,13 @@ SECRET_KEY = "test-secret-key-not-for-production"  # nosec B105
 DEBUG = False
 
 ALLOWED_HOSTS = ["testserver", "localhost"]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+    }
+}
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
