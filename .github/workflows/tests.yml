@@ -36,7 +36,7 @@ jobs:
 
       - name: Install Python deps (GDAL matched to system libgdal)
         run: |
-          pip install $(grep -v "^GDAL" requirements.txt | tr '\n' ' ')
+          grep -v "^GDAL" requirements.txt | pip install -r /dev/stdin
           pip install GDAL=="$(gdal-config --version)"
 
       - name: Run pytest
