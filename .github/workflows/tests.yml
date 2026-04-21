@@ -1,0 +1,52 @@
+name: Tests
+
+on:
+  push:
+    branches: ["main", "feature/**", "fix/**", "feat/**"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  pytest:
+    name: Pytest + Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install system deps (GDAL 3.12+ from ubuntugis)
+        run: |
+          sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin libgdal-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install Python deps (GDAL matched to system libgdal)
+        run: |
+          grep -v "^GDAL" requirements.txt | pip install -r /dev/stdin
+          pip install GDAL=="$(gdal-config --version)"
+
+      - name: Run pytest
+        run: pytest --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: |
+            coverage.xml
+            htmlcov/
