@@ -34,8 +34,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install Python deps
-        run: pip install -r requirements.txt
+      - name: Install Python deps (GDAL matched to system libgdal)
+        run: |
+          pip install $(grep -v "^GDAL" requirements.txt | tr '\n' ' ')
+          pip install GDAL=="$(gdal-config --version)"
 
       - name: Run pytest
         run: pytest --cov-report=xml --cov-report=term-missing
